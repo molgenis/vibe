@@ -32,37 +32,42 @@ PREFIX void6: <http://rdf.disgenet.org/v6.0.0/void/> # DisGeNET
 PREFIX pmid: <http://identifiers.org/pubmed/> # DisGeNET
 
 # Query.
-SELECT ?hpo ?disease ?diseaseName ?gene ?geneSymbol ?gdaScoreNumber ?gdaSource ?evidenceYear ?evidence
+SELECT ?disease ?diseaseName ?gene ?geneSymbol ?gdaScoreNumber ?gdaSource ?evidenceYear ?evidence
 WHERE {
-	VALUES ?hpo { <http://purl.obolibrary.org/obo/HP_0000003> }
 	{
-		# Diseases that are actually UMLS-codes that represent a phenotype and are an exact match with an HPO.
-		?disease skos:exactMatch ?hpo .
-	}
-	UNION
-	{
-		# Diseases that have a phenotype-disease association according to sources used in DisGeNET v5.0.
-		?pda sio:SIO_000628 ?hpo , ?disease .
+		SELECT DISTINCT ?disease
+		WHERE {
+			VALUES ?hpo { <http://purl.obolibrary.org/obo/HP_0000003> }
+			{
+				# Diseases that are actually UMLS-codes that represent a phenotype and are an exact match with an HPO.
+				?disease skos:exactMatch ?hpo .
+			}
+			UNION
+			{
+				# Diseases that have a phenotype-disease association according to sources used in DisGeNET v5.0.
+				?pda sio:SIO_000628 ?hpo , ?disease .
 
-		FILTER EXISTS { ?pda rdf:type sio:SIO_000897 . }
-		# While VDAs are also rdf:type sio:SIO_010056 with an sio:SIO_000628 to ?disease, they should not match when using VALUES ?hpo.
-	}
-	UNION
-	{
-		# Diseases linked linked to phenotypes according to Orphanet (HPO - ORDO Ontological Module).
-		{
-			SELECT ?hpo ?orphanet
-			WHERE {
-				?association owl:equivalentClass/owl:intersectionOf/rdf:rest*/rdf:first ?hpoItem , ?orphaItem .
-				?hpoItem owl:someValuesFrom ?hpo .
-				?orphaItem owl:someValuesFrom ?orphanet .
+				FILTER EXISTS { ?pda rdf:type sio:SIO_000897 . }
+				# While VDAs are also rdf:type sio:SIO_010056 with an sio:SIO_000628 to ?disease, they should not match when using VALUES ?hpo.
+			}
+			UNION
+			{
+				# Diseases linked linked to phenotypes according to Orphanet (HPO - ORDO Ontological Module).
+				{
+					SELECT ?hpo ?orphanet
+					WHERE {
+						?association owl:equivalentClass/owl:intersectionOf/rdf:rest*/rdf:first ?hpoItem , ?orphaItem .
+						?hpoItem owl:someValuesFrom ?hpo .
+						?orphaItem owl:someValuesFrom ?orphanet .
 
-				FILTER EXISTS { ?association rdfs:subClassOf hoom:Association . }
-				FILTER EXISTS { ?hpoItem owl:onProperty <http://purl.org/oban/association_has_object> . }
-				FILTER EXISTS { ?orphaItem owl:onProperty <http://purl.org/oban/association_has_subject> . }
+						FILTER EXISTS { ?association rdfs:subClassOf hoom:Association . }
+						FILTER EXISTS { ?hpoItem owl:onProperty <http://purl.org/oban/association_has_object> . }
+						FILTER EXISTS { ?orphaItem owl:onProperty <http://purl.org/oban/association_has_subject> . }
+					}
+				}
+				?disease skos:exactMatch ?orphanet .
 			}
 		}
-		?disease skos:exactMatch ?orphanet .
 	}
 
 	?gda sio:SIO_000628 ?disease , ?gene ;

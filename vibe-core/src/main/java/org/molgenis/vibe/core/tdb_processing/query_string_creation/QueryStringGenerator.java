@@ -74,26 +74,31 @@ public final class QueryStringGenerator {
      * <br />between [0] and [1]: the HPO terms (URIs) to filter on (see {@link #createValuesStringForUris(Set)}
      * <br />between [1] and [2]: the gene-disease association type (see {@link GeneDiseaseCombinationType})
      */
-    private static final String[] GENES_FOR_PHENOTYPES = {"SELECT ?hpo ?disease ?diseaseName ?gene ?geneSymbol ?gdaScoreNumber ?gdaSource ?evidenceYear ?evidence\n" +
+    private static final String[] GENES_FOR_PHENOTYPES = {"SELECT ?disease ?diseaseName ?gene ?geneSymbol ?gdaScoreNumber ?gdaSource ?evidenceYear ?evidence\n" +
             "WHERE {\n" +
-            "\tVALUES ?hpo ", "\n" + // [0] -> [1]
             "\t{\n" +
-            "\t\t# Diseases that are UMLS phenotypes.\n" +
-            "\t\t?hpo skos:exactMatch ?disease .\n" +
-            "\t}\n" +
-            "\tUNION\n" +
-            "\t{\n" +
-            "\t\t# Diseases found through phenotype-disease associations.\n" +
-            "\t\t?hpo sio:SIO_000212/sio:SIO_000628 ?disease .\n" +
-            "\t}\n" +
-            "\tUNION\n" +
-            "\t{\n" +
-            "\t\t# Diseases found through Orphanet (HPO - ORDO Ontological Module).\n" +
-            "\t\t?hpo sio:SIO_000001/skos:exactMatch ?disease .\n" +
+            "\t\tSELECT DISTINCT ?disease\n" +
+            "\t\tWHERE {\n" +
+            "\t\t\tVALUES ?hpo ", "\n" + // [0] -> [1]
+            "\t\t\t{\n" +
+            "\t\t\t\t# Diseases that are UMLS phenotypes.\n" +
+            "\t\t\t\t?hpo skos:exactMatch ?disease .\n" +
+            "\t\t\t}\n" +
+            "\t\t\tUNION\n" +
+            "\t\t\t{\n" +
+            "\t\t\t\t# Diseases found through phenotype-disease associations.\n" +
+            "\t\t\t\t?hpo sio:SIO_000212/sio:SIO_000628 ?disease .\n" +
+            "\t\t\t}\n" +
+            "\t\t\tUNION\n" +
+            "\t\t\t{\n" +
+            "\t\t\t\t# Diseases found through Orphanet (HPO - ORDO Ontological Module).\n" +
+            "\t\t\t\t?hpo sio:SIO_000001/skos:exactMatch ?disease .\n" +
+            "\t\t\t}\n" +
+            "\t\t}\n" +
             "\t}\n" +
             "\n" +
             "\t?disease sio:SIO_000212 ?gda ;\n" +
-            "\tdcterms:title ?diseaseName ." +
+            "\tdcterms:title ?diseaseName .\n" +
             "\t\n" +
             "\t?gda rdf:type/rdfs:subClassOf* ", " ;\n" + // [1] -> [2]
             "\tsio:SIO_000628 ?gene ;\n" +

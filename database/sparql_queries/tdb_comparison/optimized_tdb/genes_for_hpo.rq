@@ -32,22 +32,27 @@ PREFIX void6: <http://rdf.disgenet.org/v6.0.0/void/> # DisGeNET
 PREFIX pmid: <http://identifiers.org/pubmed/> # DisGeNET
 
 # Query.
-SELECT ?hpo ?disease ?diseaseName ?gene ?geneSymbol ?gdaScoreNumber ?gdaSource ?evidenceYear ?evidence
+SELECT ?disease ?diseaseName ?gene ?geneSymbol ?gdaScoreNumber ?gdaSource ?evidenceYear ?evidence
 WHERE {
-	VALUES ?hpo { <http://purl.obolibrary.org/obo/HP_0000003> }
 	{
-		# Diseases that are UMLS phenotypes.
-		?hpo skos:exactMatch ?disease .
-	}
-	UNION
-	{
-		# Diseases found through phenotype-disease associations.
-		?hpo sio:SIO_000212/sio:SIO_000628 ?disease .
-	}
-	UNION
-	{
-		# Diseases found through Orphanet (HPO - ORDO Ontological Module).
-		?hpo sio:SIO_000001/skos:exactMatch ?disease .
+		SELECT DISTINCT ?disease
+		WHERE {
+			VALUES ?hpo { <http://purl.obolibrary.org/obo/HP_0000003> }
+			{
+				# Diseases that are UMLS phenotypes.
+				?hpo skos:exactMatch ?disease .
+			}
+			UNION
+			{
+				# Diseases found through phenotype-disease associations.
+				?hpo sio:SIO_000212/sio:SIO_000628 ?disease .
+			}
+			UNION
+			{
+				# Diseases found through Orphanet (HPO - ORDO Ontological Module).
+				?hpo sio:SIO_000001/skos:exactMatch ?disease .
+			}
+		}
 	}
 
 	?disease sio:SIO_000212 ?gda ;

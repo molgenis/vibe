@@ -132,4 +132,37 @@ class GeneDiseaseCollectionRetrievalRunnerIT {
             () -> Assertions.assertTrue(expectedCollection.allFieldsEquals(actualCollection))
         );
     }
+
+    @Test
+    void testPubmedSourcesForHavingMoreCountsThanPubmeds() throws IOException {
+        runner = new GeneDiseaseCollectionRetrievalRunner(
+                TestData.TDB.getFullPath(), new HashSet<>(Arrays.asList(new Phenotype("hp:0002996"))));
+        GeneDiseaseCollection collection = runner.call();
+
+        Assertions.assertTrue(assertCountsEqualToPubmeds(collection));
+    }
+
+    private boolean assertCountsEqualToPubmeds(GeneDiseaseCollection collection) {
+        Source clinvar = new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/CLINVAR"),
+                "ClinVar 2018 Dataset Distribution", Source.Level.CURATED);
+
+        for(GeneDiseaseCombination combination : collection.getGeneDiseaseCombinations()) {
+            for(Source source : combination.getSourcesWithPubmedEvidence()) {
+                // Currently skips ClinVar due to sometimes having multiple GDAs with same PubMed.
+                if(source.equals(clinvar)) continue;
+
+                // If comparison fails, prints information to stderr and returns false.
+                if(combination.getPubmedEvidenceForSource(source).size() != combination.getCountForSource(source)) {
+                    System.err.println(combination.getGene().getFormattedId());
+                    System.err.println(combination.getDisease().getFormattedId());
+                    System.err.println(source.getName());
+                    System.err.println(combination.getCountForSource(source));
+                    System.err.println(combination.getPubmedEvidenceForSource(source).size());
+                    System.err.println(combination.getPubmedEvidenceForSource(source).toString());
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
