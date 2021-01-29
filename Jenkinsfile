@@ -92,7 +92,7 @@ pipeline {
                             input(message: 'Prepare to release?')
                         }
                         container('maven') {
-                            sh "mvn -q -B release:prepare -Dmaven.test.redirectTestOutputToFile=true -Darguments=\"-q -B -Dmaven.test.redirectTestOutputToFile=true\""
+                            sh "mvn -q -B release:prepare -Dmaven.test.redirectTestOutputToFile=true -DexcludedGroups='skipOnJenkins' -Darguments=\"-q -B -Dmaven.test.redirectTestOutputToFile=true -DexcludedGroups='skipOnJenkins'\""
                         }
                     }
                 }
