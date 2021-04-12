@@ -25,6 +25,9 @@ class GenePrioritizedOutputFormatWriterFactoryTest {
     private static final GeneDiseaseCollection emptyCollection = new GeneDiseaseCollection();
     private static final List<Gene> emptyPriority = Collections.emptyList();
 
+    private static GeneDiseaseCollection collectionSingleResult;
+    private static List<Gene> prioritySingleResult;
+
     @BeforeAll
     static void beforeAll() {
         // Redirect stdout for tests.
@@ -60,8 +63,14 @@ class GenePrioritizedOutputFormatWriterFactoryTest {
         geneDiseaseCombinations[1].add(sources[1]);
         geneDiseaseCombinations[2].add(sources[3]);
 
-        collection = new GeneDiseaseCollection(new HashSet<>(Arrays.asList(geneDiseaseCombinations)));
+        List<GeneDiseaseCombination> geneDiseaseCombinationsList = Arrays.asList(geneDiseaseCombinations);
+
+        collection = new GeneDiseaseCollection(new HashSet<>(geneDiseaseCombinationsList));
         priority = Arrays.asList(genes[1], genes[0]);
+
+        // Create output collection with only 1 gene (GDA 1 & 2 are both with the same gene).
+        collectionSingleResult = new GeneDiseaseCollection(new HashSet<>(geneDiseaseCombinationsList.subList(1,3)));
+        prioritySingleResult = Arrays.asList(genes[1]);
     }
 
     @AfterEach
@@ -123,6 +132,32 @@ class GenePrioritizedOutputFormatWriterFactoryTest {
         OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.REGULAR_URI.create(writer, emptyCollection, emptyPriority);
         formatWriter.run();
         String expectedOutput = "gene (NCBI)\tgene symbol (HGNC)\thighest GDA score\tdiseases (UMLS) with sources per disease" + System.lineSeparator();
+        Assertions.assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testSimpleSingleResult() throws IOException {
+        OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.SIMPLE.create(writer, collectionSingleResult, prioritySingleResult);
+        formatWriter.run();
+        String expectedOutput = "29123";
+        Assertions.assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testDefaultWithIdSingleResult() throws IOException {
+        OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.REGULAR_ID.create(writer, collectionSingleResult, prioritySingleResult);
+        formatWriter.run();
+        String expectedOutput = "gene (NCBI)\tgene symbol (HGNC)\thighest GDA score\tdiseases (UMLS) with sources per disease" + System.lineSeparator() +
+                "29123\tANKRD11\t0.8\tC0220687 (0.8):26633545,23494856|C1835764 (0.1)" + System.lineSeparator();
+        Assertions.assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testDefaultWithUriSingleResult() throws IOException {
+        OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.REGULAR_URI.create(writer, collectionSingleResult, prioritySingleResult);
+        formatWriter.run();
+        String expectedOutput = "gene (NCBI)\tgene symbol (HGNC)\thighest GDA score\tdiseases (UMLS) with sources per disease" + System.lineSeparator() +
+                "http://identifiers.org/ncbigene/29123\thttp://identifiers.org/hgnc.symbol/ANKRD11\t0.8\thttp://linkedlifedata.com/resource/umls/id/C0220687 (0.8):http://identifiers.org/pubmed/26633545,http://identifiers.org/pubmed/23494856|http://linkedlifedata.com/resource/umls/id/C1835764 (0.1)" + System.lineSeparator();
         Assertions.assertEquals(expectedOutput, outContent.toString());
     }
 }
