@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -20,6 +21,9 @@ class GenePrioritizedOutputFormatWriterFactoryTest {
     private static final StdoutOutputWriter writer = new StdoutOutputWriter();
     private static GeneDiseaseCollection collection;
     private static List<Gene> priority;
+
+    private static final GeneDiseaseCollection emptyCollection = new GeneDiseaseCollection();
+    private static final List<Gene> emptyPriority = Collections.emptyList();
 
     @BeforeAll
     static void beforeAll() {
@@ -95,6 +99,30 @@ class GenePrioritizedOutputFormatWriterFactoryTest {
         String expectedOutput = "gene (NCBI)\tgene symbol (HGNC)\thighest GDA score\tdiseases (UMLS) with sources per disease" + System.lineSeparator() +
                 "http://identifiers.org/ncbigene/29123\thttp://identifiers.org/hgnc.symbol/ANKRD11\t0.8\thttp://linkedlifedata.com/resource/umls/id/C0220687 (0.8):http://identifiers.org/pubmed/26633545,http://identifiers.org/pubmed/23494856|http://linkedlifedata.com/resource/umls/id/C1835764 (0.1)" + System.lineSeparator() +
                 "http://identifiers.org/ncbigene/2697\thttp://identifiers.org/hgnc.symbol/GJA1\t0.31\thttp://linkedlifedata.com/resource/umls/id/C0265292 (0.31):http://identifiers.org/pubmed/23951358" + System.lineSeparator();
+        Assertions.assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testSimpleEmpty() throws IOException {
+        OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.SIMPLE.create(writer, emptyCollection, emptyPriority);
+        formatWriter.run();
+        String expectedOutput = "";
+        Assertions.assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testDefaultWithIdEmpty() throws IOException {
+        OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.REGULAR_ID.create(writer, emptyCollection, emptyPriority);
+        formatWriter.run();
+        String expectedOutput = "gene (NCBI)\tgene symbol (HGNC)\thighest GDA score\tdiseases (UMLS) with sources per disease" + System.lineSeparator();
+        Assertions.assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testDefaultWithUriEmpty() throws IOException {
+        OutputFormatWriter formatWriter = GenePrioritizedOutputFormatWriterFactory.REGULAR_URI.create(writer, emptyCollection, emptyPriority);
+        formatWriter.run();
+        String expectedOutput = "gene (NCBI)\tgene symbol (HGNC)\thighest GDA score\tdiseases (UMLS) with sources per disease" + System.lineSeparator();
         Assertions.assertEquals(expectedOutput, outContent.toString());
     }
 }

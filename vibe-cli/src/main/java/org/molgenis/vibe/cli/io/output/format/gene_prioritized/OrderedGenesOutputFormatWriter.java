@@ -31,6 +31,8 @@ public class OrderedGenesOutputFormatWriter extends PrioritizedOutputFormatWrite
             getOutputWriter().write(getPriority().get(i).getId() + separator);
         }
         // Writes last gene (without added separator).
-        getOutputWriter().write(getPriority().get(getPriority().size()-1).getId());
+        if(getPriority().size() != 0) {
+            getOutputWriter().write(getPriority().get(getPriority().size() - 1).getId());
+        }
     }
 }
