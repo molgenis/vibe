@@ -33,7 +33,7 @@ The easiest way to install GAWK on MacOS is through a package manager such as [M
 
 ## Windows users
 
-Currently there isn't a bat script that offers automated database creation. Please use the already created database as available on [the molgenis download server][tdb_download].
+Currently there isn't a bat script that offers automated database creation. Please use the already created database as available on the molgenis download server (see the [main README](../README.md#quickstart)).
 
 ## Updating the database
 
@@ -89,7 +89,6 @@ When updating the database, be sure to follow these instructions:
 
 [jena_download]: https://jena.apache.org/download/index.cgi
 [jena_configure]: https://jena.apache.org/documentation/tools/#setting-up-your-environment
-[tdb_download]: http://molgenis.org/downloads/vibe/vibe-v2_0_0-tdb.zip
 [hdt-java_download]: https://github.com/rdfhdt/hdt-java/releases
 [hdt-java_compiling]: https://github.com/rdfhdt/hdt-java#compiling
 [macports]: https://www.macports.org/

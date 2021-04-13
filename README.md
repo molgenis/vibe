@@ -6,7 +6,7 @@ A tool to generate prioritized genes using phenotype information.
 
 ## Web app
 
-* Available at: http://molgenis.org/vibe
+* Available at: https://vibe.molgeniscloud.org/
 * Source code: https://github.com/molgenis/molgenis-app-vibe
 
 ## Benchmark
@@ -99,7 +99,7 @@ Before building/testing, be sure the needed test resources are downloaded. This 
 
 [vibe_download]: https://github.com/molgenis/vibe/releases/latest
 [java_download]:https://www.java.com/download
-[hdt_download]: http://molgenis.org/downloads/vibe/vibe-5.0.0-hdt.tar.gz
+[hdt_download]: https://downloads.molgeniscloud.org/downloads/vibe/vibe-5.0.0-hdt.tar.gz
 [jena_download]:https://jena.apache.org/download/index.cgi
 [jena_configure]: https://jena.apache.org/documentation/tools/#setting-up-your-environment
 [hpo_owl]:http://purl.obolibrary.org/obo/hp.owl
