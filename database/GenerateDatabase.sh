@@ -17,7 +17,7 @@ errcho() { echo "$@" 1>&2; }
 readonly USAGE="Usage: GenerateDatabase.sh [-h] [-1] [-2] [-3] [-4] [-5]
 Description: Generates database for vibe.
 The process is split into multiple phases which can be chosen individually.
-If no phase is given, runs phase 1-4 one after another.
+If no phase is given, runs phase 1-6 one after another.
 
 Arguments:
 -h  --help      Shows this help message.
