@@ -199,56 +199,74 @@ digestCommandLine() {
     echo "archive:${doOptimizedDatabaseArchive}"
 
     # Check whether directories/files might already exist.
-    validateDataPresence
+    validatePhasesRunnable
 }
 
-validateDataPresence() {
+validatePhasesRunnable() {
     echo "######## ######## ######## Checking existence phase-specific directories ######## ######## ########"
     # Done separately (instead of integrated into main) so that first all necessary directories are
     # checked whether they already exist before anything is actually done.
     
     # Boolean for when a directory/file which should be created already exists.
-    local pathExists=false
+    local phaseRunnableError=false
 
     # Checks directories for the different phases.
     if [[ ${doDownload} == true ]]
     then
-        if [ -d "$SOURCES_DIR" ]; then pathExists=true; errcho "${SOURCES_DIR} already exists."; fi
+        # This phase check.
+        if [ -d "$SOURCES_DIR" ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} already exists."; fi
     fi
 
     if [[ ${doPrepare} == true ]]
     then
-        if [ ! -d "$SOURCES_DIR" ]; then pathExists=true; errcho "${SOURCES_DIR} does not exists."; fi
-        if [ -f "$SOURCES_DIR"/.prepared ]; then pathExists=true; errcho "${SOURCES_DIR} already prepared."; fi
+        # Previous phase check.
+        if [ ${doDownload} == false ] && [ ! -d "$SOURCES_DIR" ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} does not exists."; fi
+        # This phase check.
+        if [ -f "$SOURCES_DIR"/.prepared ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} already prepared."; fi
     fi
 
     if [[ ${doOriginalTdb} == true ]]
     then
-        if [ -d "$INITIAL_TDB_DIR" ]; then pathExists=true; errcho "${INITIAL_TDB_DIR} already exists."; fi
+        # Previous phase check.
+        if [ ${doPrepare} == false ] && [ ! -f "$SOURCES_DIR"/.prepared ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} not yet prepared."; fi
+        # This phase check.
+        if [ -d "$INITIAL_TDB_DIR" ]; then phaseRunnableError=true; errcho "${INITIAL_TDB_DIR} already exists."; fi
     fi
 
     if [[ ${doOptimizedTtl} == true ]]
     then
-        if [ -d "$TTL_DIR" ]; then pathExists=true; errcho "${TTL_DIR} already exists."; fi
+        # Previous phase check.
+        if [ ${doOriginalTdb} == false ] && [ ! -d "$INITIAL_TDB_DIR" ]; then phaseRunnableError=true; errcho "${INITIAL_TDB_DIR} does not exists."; fi
+        # This phase check.
+        if [ -d "$TTL_DIR" ]; then phaseRunnableError=true; errcho "${TTL_DIR} already exists."; fi
     fi
 
     if [[ ${doMergeOptimizedTtl} == true ]]
     then
-        if [ -f "$FINAL_TTL_FILE" ]; then pathExists=true; errcho "${FINAL_TTL_FILE} already exists."; fi
+        # Previous phase check.
+        if [ ${doOptimizedTtl} == false ] && [ ! -d "$TTL_DIR" ]; then phaseRunnableError=true; errcho "${TTL_DIR} does not exists."; fi
+        # This phase check.
+        if [ -f "$FINAL_TTL_FILE" ]; then phaseRunnableError=true; errcho "${FINAL_TTL_FILE} already exists."; fi
     fi
 
     if [[ ${doOptimizedDatabase} == true ]]
     then
-        if [ -d "$FINAL_HDT_DIR" ]; then pathExists=true; errcho "${FINAL_HDT_DIR} already exists."; fi
+        # Previous phase check.
+        if [ ${doMergeOptimizedTtl} == false ] && [ ! -f "$FINAL_TTL_FILE" ]; then phaseRunnableError=true; errcho "${FINAL_TTL_FILE} does not exists."; fi
+        # This phase check.
+        if [ -d "$FINAL_HDT_DIR" ]; then phaseRunnableError=true; errcho "${FINAL_HDT_DIR} already exists."; fi
     fi
 
     if [[ ${doOptimizedDatabaseArchive} == true ]]
     then
-        if [ -d "$FINAL_HDT_ARCHIVE" ]; then pathExists=true; errcho "${FINAL_HDT_ARCHIVE} already exists."; fi
+        # Previous phase check.
+        if [ ${doOptimizedDatabase} == false ] && [ ! -d "$FINAL_HDT_DIR" ]; then phaseRunnableError=true; errcho "${FINAL_HDT_DIR} does not exists."; fi
+        # This phase check.
+        if [ -d "$FINAL_HDT_ARCHIVE" ]; then phaseRunnableError=true; errcho "${FINAL_HDT_ARCHIVE} already exists."; fi
     fi
 
     # If a directory already exists, exits script.
-    if [[ ${pathExists} == true ]]; then errcho "Exiting."; exit 1; fi
+    if [[ ${phaseRunnableError} == true ]]; then errcho "Exiting."; exit 1; fi
 }
 
 downloadData() {
