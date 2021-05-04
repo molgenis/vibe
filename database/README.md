@@ -60,7 +60,7 @@ When updating the database, be sure to follow these instructions:
 
 4. Use `cd` to a directory where you want to create the new database and run `database/GenerateDatabase.sh -1` from there.
 
-5. Go to the newly created directory (`cd vibe-<version>-sources`) and run `shasum -a 256 $(find . -not -path '*/.*' -type f) > path/to/vibe/database/sources_checksums.txt`.
+5. Go to the newly created directory (`cd vibe-<version>-sources`), run `shasum -a 256 $(find . -not -path '*/.*' -type f) > path/to/vibe/database/sources_checksums.txt` and check the created output (checksums for all needed files and only those).
 
 6. Validate whether `database/LICENSES.md` is still up-to-date, and if not, adjust it.
 
