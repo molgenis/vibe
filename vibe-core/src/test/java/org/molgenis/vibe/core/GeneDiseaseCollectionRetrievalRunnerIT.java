@@ -23,7 +23,7 @@ import java.util.*;
 @Execution(ExecutionMode.SAME_THREAD)
 class GeneDiseaseCollectionRetrievalRunnerIT {
     private static GeneDiseaseCollectionRetrievalRunner runner;
-    private static final String DISGENET_VERSION = "v7.0.0";
+    private static final String DISGENET_VERSION = TestConstants.DISGENET_VERSION.get();
 
     @Test
     void retrieveGeneDiseaseCollectionForHpo0008438() throws IOException {
