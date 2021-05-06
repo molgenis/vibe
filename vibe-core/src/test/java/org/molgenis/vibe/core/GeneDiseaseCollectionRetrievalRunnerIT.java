@@ -140,9 +140,6 @@ class GeneDiseaseCollectionRetrievalRunnerIT {
         );
         GeneDiseaseCollection actualCollection = runner.call();
 
-        System.out.println(expectedCollection.toString());
-        System.out.println(actualCollection.toString());
-
         Assertions.assertAll(
             () -> Assertions.assertEquals(expectedCollection, actualCollection),
             () -> Assertions.assertTrue(expectedCollection.allFieldsEquals(actualCollection))
