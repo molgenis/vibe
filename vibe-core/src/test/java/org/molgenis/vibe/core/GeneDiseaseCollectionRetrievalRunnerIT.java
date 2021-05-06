@@ -23,113 +23,125 @@ import java.util.*;
 @Execution(ExecutionMode.SAME_THREAD)
 class GeneDiseaseCollectionRetrievalRunnerIT {
     private static GeneDiseaseCollectionRetrievalRunner runner;
+    private static final String DISGENET_VERSION = "v7.0.0";
 
     @Test
     void retrieveGeneDiseaseCollectionForHpo0008438() throws IOException {
-        /**
-         * obo:HP_0008438  a        sio:SIO_010056 ;
-         *         sio:SIO_000001   ordo:Orphanet_85184 ;
-         *         sio:SIO_000212   pda:DGN8a0e701b56199eca12831b38431d7959 ;
-         *         skos:exactMatch  umls:C1835764 .
-         */
-        Disease[] diseases = new Disease[]{
-                new Disease("umls:C0265292", "Schwartz-Lelek syndrome"), // ordo:Orphanet_85184
-                new Disease("umls:C0220687", "KBG syndrome"), // pda:DGN8a0e701b56199eca12831b38431d7959
-                new Disease("umls:C1835764", "Vertebral arch anomaly"), // skos:exactMatch
-        };
+        // Diseases.
+        Map<String,Disease> diseases = new HashMap<>();
+        diseases.put("C0265292", new Disease("umls:C0265292", "Schwartz-Lelek syndrome")); // ordo:Orphanet_85184
+        diseases.put("C0220687", new Disease("umls:C0220687", "KBG syndrome")); // pda:DGN8a0e701b56199eca12831b38431d7959
+        diseases.put("C1835764", new Disease("umls:C1835764", "Vertebral arch anomaly")); // skos:exactMatch
 
-        Gene[] genes = new Gene[]{
-                new Gene("ncbigene:479", new GeneSymbol("hgnc:ATP12A")),
-                new Gene("ncbigene:56172", new GeneSymbol("hgnc:ANKH")),
-                new Gene("ncbigene:286", new GeneSymbol("hgnc:ANK1")),
-                new Gene("ncbigene:2697", new GeneSymbol("hgnc:GJA1")),
-                new Gene("ncbigene:29123", new GeneSymbol("hgnc:ANKRD11")),
-        };
+        // Genes.
+        Map<String,Gene> genes = new HashMap<>();
+        genes.put("2475", new Gene("ncbigene:2475", new GeneSymbol("hgnc:MTOR")));
+        genes.put("29123", new Gene("ncbigene:29123", new GeneSymbol("hgnc:ANKRD11")));
+        genes.put("23522", new Gene("ncbigene:23522", new GeneSymbol("hgnc:KAT6B")));
+        genes.put("23028", new Gene("ncbigene:23028", new GeneSymbol("hgnc:KDM1A")));
+        genes.put("56172", new Gene("ncbigene:56172", new GeneSymbol("hgnc:ANKH")));
+        genes.put("286", new Gene("ncbigene:286", new GeneSymbol("hgnc:ANK1")));
+        genes.put("2697", new Gene("ncbigene:2697", new GeneSymbol("hgnc:GJA1")));
 
-        GeneDiseaseCombination[] geneDiseaseCombinations = new GeneDiseaseCombination[]{
-                // GDAs umls:C0265292
-                new GeneDiseaseCombination(genes[0], diseases[0], 0.02E0),
-                new GeneDiseaseCombination(genes[1], diseases[0], 0.37E0),
-                new GeneDiseaseCombination(genes[2], diseases[0], 0.03E0),
-                new GeneDiseaseCombination(genes[3], diseases[0], 0.31E0),
+        // Combinations.
+        Map<String,GeneDiseaseCombination> geneDiseaseCombinations = new HashMap<>();
+        geneDiseaseCombinations.put("2475-C1835764", new GeneDiseaseCombination(genes.get("2475"), diseases.get("C1835764"), 0.1E0));
+        geneDiseaseCombinations.put("29123-C1835764", new GeneDiseaseCombination(genes.get("29123"), diseases.get("C1835764"), 0.1E0));
 
-                // GDAs umls:C0220687
-                new GeneDiseaseCombination(genes[4], diseases[1], 0.8E0), // [4]
+        geneDiseaseCombinations.put("29123-C0220687", new GeneDiseaseCombination(genes.get("29123"), diseases.get("C0220687"), 0.8E0));
+        geneDiseaseCombinations.put("23522-C0220687", new GeneDiseaseCombination(genes.get("23522"), diseases.get("C0220687"), 0.1E0));
+        geneDiseaseCombinations.put("23028-C0220687", new GeneDiseaseCombination(genes.get("23028"), diseases.get("C0220687"), 0.01E0));
 
-                // GDAs umls:C1835764
-                new GeneDiseaseCombination(genes[4], diseases[2], 0.1E0), // [5]
-        };
+        geneDiseaseCombinations.put("56172-C0265292", new GeneDiseaseCombination(genes.get("56172"), diseases.get("C0265292"), 0.38E0));
+        geneDiseaseCombinations.put("286-C0265292", new GeneDiseaseCombination(genes.get("286"), diseases.get("C0265292"), 0.04E0));
+        geneDiseaseCombinations.put("2697-C0265292", new GeneDiseaseCombination(genes.get("2697"), diseases.get("C0265292"), 0.31E0));
 
-        Source[] sources = new Source[] {
-                new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/BEFREE"), "BeFree 2018 Dataset Distribution", Source.Level.LITERATURE),
-                new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/ORPHANET"), "Orphanet 2017 Dataset Distribution", Source.Level.CURATED),
-                new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/CLINVAR"), "ClinVar 2018 Dataset Distribution", Source.Level.CURATED),
-                new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/UNIPROT"), "UniProt 2018 Dataset Distribution", Source.Level.CURATED),
-                new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/CTD_human"), "CTD_human 2018 Dataset Distribution", Source.Level.CURATED),
-                new Source(URI.create("http://rdf.disgenet.org/v6.0.0/void/HPO"), "HPO", Source.Level.CURATED),
-        };
+        // Sources.
+        HashMap<String,Source> sources = new HashMap<>();
+        sources.put("BEFREE", new Source(URI.create("http://rdf.disgenet.org/" + DISGENET_VERSION + "/void/BEFREE"), "BeFree 2018 Dataset Distribution", Source.Level.LITERATURE));
+        sources.put("ORPHANET", new Source(URI.create("http://rdf.disgenet.org/" + DISGENET_VERSION + "/void/ORPHANET"), "Orphanet 2017 Dataset Distribution", Source.Level.CURATED));
+        sources.put("CLINVAR", new Source(URI.create("http://rdf.disgenet.org/" + DISGENET_VERSION + "/void/CLINVAR"), "ClinVar 2018 Dataset Distribution", Source.Level.CURATED));
+        sources.put("UNIPROT", new Source(URI.create("http://rdf.disgenet.org/" + DISGENET_VERSION + "/void/UNIPROT"), "UniProt 2018 Dataset Distribution", Source.Level.CURATED));
+        sources.put("CTD_human", new Source(URI.create("http://rdf.disgenet.org/" + DISGENET_VERSION + "/void/CTD_human"), "CTD_human 2018 Dataset Distribution", Source.Level.CURATED));
+        sources.put("HPO", new Source(URI.create("http://rdf.disgenet.org/" + DISGENET_VERSION + "/void/HPO"), "HPO", Source.Level.CURATED));
 
-        // GDAs umls:C0265292
-        geneDiseaseCombinations[0].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/8630510"), 1996));
-        geneDiseaseCombinations[0].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/7678608"), 1993));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/16462526"), 2006));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20943778"), 2011));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20358596"), 2010));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/19257826"), 2009));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21149338"), 2011));
-        geneDiseaseCombinations[2].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/16462526"), 2006));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/26820766"), 2016));
-        geneDiseaseCombinations[1].add(sources[1]);
-        geneDiseaseCombinations[3].add(sources[1]);
-        geneDiseaseCombinations[3].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23951358"), 2014));
-        geneDiseaseCombinations[1].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20186813"), 2010));
-        geneDiseaseCombinations[2].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/19257826"), 2009));
-        geneDiseaseCombinations[2].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21149338"), 2011));
+        // Add info to combinations.
+        geneDiseaseCombinations.get("2475-C1835764").add(sources.get("CLINVAR"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27159400"), 2016));
+        geneDiseaseCombinations.get("29123-C1835764").add(sources.get("HPO"));
 
-        // GDAs umls:C0220687
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25413698"), 2015));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/28250421"), 2018));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23369839"), 2014));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25741868"), 2015));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/15523620"), 2004));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27900361"), 2016));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/15378538"), 2005));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
-        geneDiseaseCombinations[4].add(sources[3], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23184435"), 2013));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25424714"), 2016));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/22307766"), 2012));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27667800"), 2017));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/29565525"), 1993));
-        geneDiseaseCombinations[4].add(sources[4]);
-        geneDiseaseCombinations[4].add(sources[3], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25413698"), 2015));
-        geneDiseaseCombinations[4].add(sources[2]);
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25464108"), 2015));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/28708303"), 2018));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25125236"), 2015));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25187894"), 2015));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/24838796"), 2015));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/24088041"), 2013));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25125236"), 2015));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/29224748"), 2018));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23463723"), 2013));
-        geneDiseaseCombinations[4].add(sources[0], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23494856"), 2013));
-        geneDiseaseCombinations[4].add(sources[2], new PubmedEvidence(URI.create("http://identifiers.org/pubmed/26633545"), 2017));
-        geneDiseaseCombinations[4].add(sources[1]);
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/28250421"), 2017));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27667800"), 2016));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("UNIPROT"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25464108"), 2015));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CLINVAR"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27824329"), 2016));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27605097"), 2016));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/24838796"), 2014));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CTD_human"));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/30877071"), 2019));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25424714"), 2015));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/29696793"), 2018));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CLINVAR"));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25125236"), 2014));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/30088855"), 2018));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/30642272"), 2019));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/31566922"), 2019));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/28422132"), 2017));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23184435"), 2013));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23494856"), 2013));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23369839"), 2013));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25413698"), 2015));
+        geneDiseaseCombinations.get("23522-C0220687").add(sources.get("CLINVAR"));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25187894"), 2014));
+        geneDiseaseCombinations.get("23028-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/24838796"), 2014));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/29224748"), 2017));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/22307766"), 2012));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/29274743"), 2018));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23463723"), 2013));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CLINVAR"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27605097"), 2016));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CLINVAR"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/27667800"), 2016));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CLINVAR"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/28449295"), 2017));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("UNIPROT"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/25413698"), 2015));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("ORPHANET"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23184435"), 2013));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("ORPHANET"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21782149"), 2011));
+        geneDiseaseCombinations.get("29123-C0220687").add(sources.get("CLINVAR"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/26633545"), 2016));
 
-        // GDAs umls:C1835764
-        geneDiseaseCombinations[5].add(sources[5]);
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20358596"), 2010));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/26820766"), 2016));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/16462526"), 2006));
+        geneDiseaseCombinations.get("286-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/16462526"), 2006));
+        geneDiseaseCombinations.get("286-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21149338"), 2011));
+        geneDiseaseCombinations.get("286-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/19257826"), 2009));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21149338"), 2011));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/29056330"), 2017));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("ORPHANET"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/11326272"), 2001));
+        geneDiseaseCombinations.get("2697-C0265292").add(sources.get("ORPHANET"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23951358"), 2013));
+        geneDiseaseCombinations.get("2697-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/23951358"), 2013));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("ORPHANET"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/11326338"), 2001));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/19257826"), 2009));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20186813"), 2010));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20943778"), 2011));
+        geneDiseaseCombinations.get("286-C0265292").add(sources.get("BEFREE"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/20358596"), 2010));
+        geneDiseaseCombinations.get("56172-C0265292").add(sources.get("ORPHANET"), new PubmedEvidence(URI.create("http://identifiers.org/pubmed/21438135"), 2011));
 
-        // Create collection.
+        // Collection.
         GeneDiseaseCollection expectedCollection = new GeneDiseaseCollection();
-        expectedCollection.addAll(Arrays.asList(geneDiseaseCombinations));
+        for(GeneDiseaseCombination gda:geneDiseaseCombinations.values()) {
+            expectedCollection.add(gda);
+        }
+
+        System.out.println();
+
 
         runner = new GeneDiseaseCollectionRetrievalRunner(
                 new VibeDatabase(TestData.HDT.getFullPath(), ModelReaderFactory.HDT),
                 new HashSet<>(Arrays.asList(new Phenotype("hp:0008438")))
         );
         GeneDiseaseCollection actualCollection = runner.call();
+
+        System.out.println(expectedCollection.toString());
+        System.out.println(actualCollection.toString());
 
         Assertions.assertAll(
             () -> Assertions.assertEquals(expectedCollection, actualCollection),
