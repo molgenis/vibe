@@ -362,10 +362,12 @@ addVersionInformationToDatabaseDir() {
     echo "\n### used database versions ###" >> ${FINAL_INFO_FILE}
     gawk 'match($0, /<versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/versionInfo>/, arr) {print "HOOM v" arr[1]; exit}' ${SOURCES_DIR}/owlapi.xml >> ${FINAL_INFO_FILE}
     gawk 'match($0, /<owl:versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/owl:versionInfo>/, arr) {print "SIO v" arr[1]; exit}' ${SOURCES_DIR}/sio-release.owl >> ${FINAL_INFO_FILE}
-    find ${SOURCES_DIR} -type d -not -name ".*" -maxdepth 1 | gawk 'match($0, /(v[0-9]+\.[0-9]+\.[0-9]+)/, arr) {print "DisGeNET " arr[1]}' >> ${FINAL_INFO_FILE}
 
-    # Manually add note in regards to v5.0.0 data from DisGeNET
-    printf "(DisGeNET v5.0.0: pda.ttl, phenotype.ttl & void.ttl only)" >> ${FINAL_INFO_FILE}
+    # Uses available directories in sources dir to define used DisGeNET version (excludes v5.0.0 due to manual defining that).
+    find ${SOURCES_DIR} -type d -not -name ".*" -a -not -name 'v5.0.0' -maxdepth 1 | gawk 'match($0, /(v[0-9]+\.[0-9]+\.[0-9]+)/, arr) {print "DisGeNET " arr[1]}' >> ${FINAL_INFO_FILE}
+
+    # Manually add DisGeNET v5.0.0
+    printf "DisGeNET v5.0.0: pda.ttl, phenotype.ttl & void.ttl only" >> ${FINAL_INFO_FILE}
 }
 
 createArchive() {
