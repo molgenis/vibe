@@ -46,53 +46,60 @@ Currently there isn't a bat script that offers automated database creation. Plea
 
 ## Updating the database
 
-When updating the database, be sure to follow these instructions:
+**Path explanation:**
+
+- `/path/to/vibe/` → the directory where the vibe git repository is stored
+- `/path/to/data/` → the directory where the database is generated in
+
+**Step-by-step instructions:**
 
 1. Check whether any breaking changes were made in the new version of the sources.
 
    - If there are no breaking changes, simply continue to the next step (minor release).
 
-   - If there are breaking changes, a new major release might be required with adjustments to the java-app and the SPARQL queries in `database/sparql_queries/*`. These steps can still be used as a guideline, but changes might need to be made before actually running them. Be sure to add/update scripts in `database/tdb_comparison/` to reflect the querries used in the vibe-app.
+   - If there are breaking changes, a new major release might be required with adjustments to the java-app and the SPARQL queries in `/path/to/vibe/database/sparql_queries/*`. These steps can still be used as a guideline, but changes might need to be made before actually running them. Be sure to add/update scripts in `/path/to/vibe/database/tdb_comparison/` to reflect the querries used in the vibe-app.
 
-2. Change the project's `version` and `vibe-database.version` in the `pom.xml` to reflect the new release.
+2. Change the project's `version` and `vibe-database.version` in the `/path/to/vibe/pom.xml` to reflect the new release.
 
-3. Update the links in the `DownloadData()` method from `database/GenerateDatabase.sh`  to the new versions of the used sources & ensure the dump file (if present) is excluded correctly.
+3. Update the links in the `DownloadData()` method from `/path/to/vibe/database/GenerateDatabase.sh`  to the new versions of the used sources & ensure the dump file (if present) is excluded correctly.
 
-4. Update the `dvoid` prefix to the new DisGeNET version in the scripts stored at `database/sparql_queries` & `vibe-core/src/main/java/org/molgenis/vibe/core/database_processing/query_string_creation/QueryStrinGenerator.java`.
+4. Update the `dvoid` prefix to the new DisGeNET version in the scripts stored at `/path/to/vibe/database/sparql_queries` & `/path/to/vibe/vibe-core/src/main/java/org/molgenis/vibe/core/database_processing/query_string_creation/QueryStrinGenerator.java`.
 
-5. Use `cd` to a directory where you want to create the new database and run `database/GenerateDatabase.sh -1` from there.
+5. Use `cd` to a directory where you want to create the new database (`cd /path/to/data/`) and run `/path/to/vibe/database/GenerateDatabase.sh -1` from there.
 
-6. Go to the newly created directory (`cd vibe-<version>-sources`), run `shasum -a 256 $(find . -not -path '*/.*' -type f) > path/to/vibe/database/sources_checksums.txt` and check the created output (checksums for all needed files and only those).
+6. Go to the newly created directory (`cd /path/to/data/vibe-<version>-sources`), run `shasum -a 256 $(find . -not -path '*/.*' -type f) > path/to/vibe/database/sources_checksums.txt` and check the created output (checksums for all needed files and only those).
 
-7. Validate whether `database/LICENSES.md` is still up-to-date, and if not, adjust it.
+7. Validate whether `/path/to/vibe/database/LICENSES.md` is still up-to-date, and if not, adjust it.
 
-8. Go back to the parent directory (`cd ../`) and run  `vibe/database/GenerateDatabase.sh -2 -3 -4 -5 -6`.
+8. Go back to the parent data directory (`cd /path/to/data/`) and run  `/path/to/vibe/database/GenerateDatabase.sh -2 -3 -4 -5 -6`.
 
    - Note that this step can take several hours.
 
    - If any error is thrown or the generated output files seem incorrect, a breaking change might exist and adjustments should be made to the process accordingly.
 
-9. Run `database/test/TestOptimizedQueries.sh`.
+9. Run `/path/to/vibe/database/test/TestOptimizedQueries.sh`.
 
    - If it fails, something went wrong in creating the optimized database from the original one as they do not return the exact same information. This might be caused by a breaking change which requires an adjustment to the database creation process.
 
-10. Copy the `vibe-<version>-hdt` directory to `shared_testdata/shared`, rename the folder to `hdt` and remove the version number (including the `-`) from the files in the folder.
+10. Copy the `/path/to/data/vibe-<version>-hdt` directory to `/path/to/vibe/shared_testdata/shared`, rename the folder to `hdt` and remove the version number (including the `-`) from the files in the folder.
 
-11. Update the value of `DISGENET_VERSION` in `vibe-core/src/test/java/org/molgenis/vibe/core/TestConstants.java`.
+11. Update the value of `DISGENET_VERSION` in `/path/to/vibe/vibe-core/src/test/java/org/molgenis/vibe/core/TestConstants.java`.
 
 12. Run `mvn clean verify` on the project and check for any failing test.
 
-    - If a test fails due to small changes such as a new results, simply fix the unit-test. The `database/TurtleFinder.sh` script can be used for retrieving data in plaint text from the generated `.ttl` files which were generated through `GenerateDatabase.sh -4` (be sure to `cd` to the `vibe-<version>-ttl` before using this script).
+    - If a test fails due to small changes such as a new results, simply fix the unit-test. The `/path/to/vibe/database/TurtleFinder.sh` script can be used for retrieving data in plaint text from the generated `.ttl` files which were generated through `/path/to/vibe/database/GenerateDatabase.sh -4` (be sure to `cd` to the `/path/to/data/vibe-<version>-ttl` directory before using this script).
 
-    - If larger problems occur, there might be a breaking change and adjustments to the java-app and/or TDB creation might be required. Be sure to add/update scripts in `database/tdb_comparison/` to reflect the querries used in the vibe-app. 
+    - If larger problems occur, there might be a breaking change and adjustments to the java-app and/or TDB creation might be required. Be sure to add/update scripts in `/path/to/vibe/database/tdb_comparison/` to reflect the querries used in the vibe-app. 
 
-13. Run `database/GenerateDatabase.sh -7` from the database directory.
+13. Run `/path/to/vibe/database/GenerateDatabase.sh -7` from the `/path/to/data` directory.
 
-14. Upload the new TDB archive to the download server.
+14. Run `shasum -a 256 vibe-5.1.0-hdt.tar.gz > /path/to/vibe/database/database_checksum.txt`
 
-15. Test whether `TestsPreprocessor.sh` still functions correctly.
+15. Upload the new TDB archive to the download server.
 
-16. Make a pull-request with the changes.
+16. Test whether `/path/to/vibe/TestsPreprocessor.sh` still functions correctly.
+
+17. Make a pull-request with the changes.
 
 ## F.A.Q.
 

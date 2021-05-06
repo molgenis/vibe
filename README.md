@@ -16,7 +16,7 @@ A tool to generate prioritized genes using phenotype information.
 ## Quickstart
 
 * Download [vibe .jar file][vibe_download]
-* Download and extract [HDT][hdt_download]
+* Download and extract [HDT][hdt_download] ([sha256 checksum](./database/database_checksum.txt))
 * Download the [HPO.owl][hpo_owl]
 * Make sure you have [Java 8 or higher][java_download]
 * Open a terminal and run VIBE. `java -jar vibe-with-dependencies-<version>.jar -d -t vibe-<db-version>.hdt -o results.tsv -p HP:0002996 -p HP:0001377`
