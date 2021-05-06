@@ -365,7 +365,7 @@ addVersionInformationToDatabaseDir() {
     find ${SOURCES_DIR} -type d -not -name ".*" -maxdepth 1 | gawk 'match($0, /(v[0-9]+\.[0-9]+\.[0-9]+)/, arr) {print "DisGeNET " arr[1]}' >> ${FINAL_INFO_FILE}
 
     # Manually add note in regards to v5.0.0 data from DisGeNET
-    printf "(v5.0.0: pda.ttl, phenotype.ttl & void.ttl only)" >> ${FINAL_INFO_FILE}
+    printf "(DisGeNET v5.0.0: pda.ttl, phenotype.ttl & void.ttl only)" >> ${FINAL_INFO_FILE}
 }
 
 createArchive() {
