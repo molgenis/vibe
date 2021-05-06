@@ -87,10 +87,10 @@ runTests() {
 
 	# Runs queries.
 	echo "### Running original TDB/query."
-	tdbquery --time --results=CSV --loc="$TDB_original" --query="sparql_queries/tdb_comparison/original_tdb/genes_for_hpo.rq" 1>"test/genes_for_hpo-original.tsv"
+	time tdbquery --results=CSV --loc="$TDB_original" --query="sparql_queries/tdb_comparison/original_tdb/genes_for_hpo.rq" 1>"test/genes_for_hpo-original.tsv"
 	echo "### Running optimized HDT/query."
   QUERY=$(cat "sparql_queries/tdb_comparison/optimized_tdb/genes_for_hpo.rq")
-  hdtsparql.sh ${HDT_optimized} "${QUERY}" 1>"test/genes_for_hpo-optimized.tsv"
+  time hdtsparql.sh ${HDT_optimized} "${QUERY}" 1>"test/genes_for_hpo-optimized.tsv"
 
 	# Compare shasums.
 	echo "### Validating if optimized TDB/query output files are equal to their original counterparts."
