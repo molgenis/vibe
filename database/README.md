@@ -58,7 +58,7 @@ When updating the database, be sure to follow these instructions:
 
 3. Update the links in the `DownloadData()` method from `database/GenerateDatabase.sh`  to the new versions of the used sources & ensure the dump file (if present) is excluded correctly.
 
-4. Update the `dvoid` prefix to the new DisGeNET version in the scripts stored at `database/sparql_queries` & `vibe-core/src/main/java/org.molgenis.vibe.core/database_processing/query_string_creation/QueryStrinGenerator.java`.
+4. Update the `dvoid` prefix to the new DisGeNET version in the scripts stored at `database/sparql_queries` & `vibe-core/src/main/java/org/molgenis/vibe/core/database_processing/query_string_creation/QueryStrinGenerator.java`.
 
 5. Use `cd` to a directory where you want to create the new database and run `database/GenerateDatabase.sh -1` from there.
 
@@ -76,7 +76,7 @@ When updating the database, be sure to follow these instructions:
 
    - If it fails, something went wrong in creating the optimized database from the original one as they do not return the exact same information. This might be caused by a breaking change which requires an adjustment to the database creation process.
 
-10. Copy the `vibe-<version>-hdt` directory to `shared_testdata/shared` and remove any version numbers from the directory/file names.
+10. Copy the `vibe-<version>-hdt` directory to `shared_testdata/shared`, rename the folder to `hdt` and remove the version number (including the `-`) from the files in the folder.
 
 11. Run `mvn clean verify` on the project and check for any failing test.
 
