@@ -277,25 +277,13 @@ downloadData() {
     cd ${SOURCES_DIR}
 
     # DisGeNET (general)
-    wget --no-verbose --show-progress \
-        -r --no-parent --no-host-directories --cut-dirs=1 \
-        -A '*.ttl.gz' -R '*-dump.*' \
-        'http://rdf.disgenet.org/download/v7.0.0/'
-
+    wget --no-verbose --show-progress -r --no-parent --no-host-directories --cut-dirs=1 -A '*.ttl.gz' -R '*-dump.*' 'http://rdf.disgenet.org/download/v7.0.0/'
     # DisGeNET (data from v5.0.0 for phenotype-disease associations)
-    wget --no-verbose --show-progress \
-        -r --no-parent --no-host-directories --cut-dirs=1 \
-        -A 'pda.ttl.tar.gz,phenotype.ttl.tar.gz,void.ttl.tar.gz' \
-        'http://rdf.disgenet.org/download/v5.0.0/'
-
+    wget --no-verbose --show-progress -r --no-parent --no-host-directories --cut-dirs=1 -A 'pda.ttl.tar.gz,phenotype.ttl.tar.gz,void.ttl.tar.gz' 'http://rdf.disgenet.org/download/v5.0.0/'
     # Semanticscience Integrated Ontology
-    wget --no-verbose --show-progress \
-        'https://raw.githubusercontent.com/MaastrichtU-IDS/semanticscience/65336c5ba45d4a4cd36b8bec2042c2786bc4ca1f/ontology/sio/release/sio-release.owl'
-
+    wget --no-verbose --show-progress 'https://raw.githubusercontent.com/MaastrichtU-IDS/semanticscience/65336c5ba45d4a4cd36b8bec2042c2786bc4ca1f/ontology/sio/release/sio-release.owl'
     # Orphadata HOOM
-    wget --no-verbose --show-progress \
-        -O owlapi.xml \
-        'http://data.bioontology.org/ontologies/HOOM/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf'
+    wget --no-verbose --show-progress -O owlapi.xml 'http://data.bioontology.org/ontologies/HOOM/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf'
 
     # Returns to original dir.
     cd ${CURRENT_PATH}
@@ -335,8 +323,7 @@ unpackDownloadedArchives() {
 
 createInitialTdb() {
     echo "######## ######## ######## Creating initial TDB ######## ######## ########"
-    tdbloader2 --loc ${INITIAL_TDB_DIR} ${SOURCES_DIR}/sio-release.owl ${SOURCES_DIR}/owlapi.xml \
-      $(find ${SOURCES_DIR} -name '*.ttl')
+    tdbloader2 --loc ${INITIAL_TDB_DIR} ${SOURCES_DIR}/sio-release.owl ${SOURCES_DIR}/owlapi.xml $(find ${SOURCES_DIR} -name '*.ttl')
 }
 
 createOptimizedTtlFiles() {
@@ -344,23 +331,17 @@ createOptimizedTtlFiles() {
     mkdir ${TTL_DIR}
 
     echo "Generating: hpo.ttl"
-    tdbquery --loc=${INITIAL_TDB_DIR} \
-      --query=${BASE_PATH}/sparql_queries/optimized_construct/hpo.rq 1> ${TTL_DIR}/hpo.ttl
+    tdbquery --loc=${INITIAL_TDB_DIR} --query=${BASE_PATH}/sparql_queries/optimized_construct/hpo.rq 1> ${TTL_DIR}/hpo.ttl
     echo "Generating: disease.ttl"
-    tdbquery --loc=${INITIAL_TDB_DIR} \
-      --query=${BASE_PATH}/sparql_queries/optimized_construct/disease.rq 1> ${TTL_DIR}/disease.ttl
+    tdbquery --loc=${INITIAL_TDB_DIR} --query=${BASE_PATH}/sparql_queries/optimized_construct/disease.rq 1> ${TTL_DIR}/disease.ttl
     echo "Generating: gene.ttl"
-    tdbquery --loc=${INITIAL_TDB_DIR} \
-      --query=${BASE_PATH}/sparql_queries/optimized_construct/gene.rq 1> ${TTL_DIR}/gene.ttl
+    tdbquery --loc=${INITIAL_TDB_DIR} --query=${BASE_PATH}/sparql_queries/optimized_construct/gene.rq 1> ${TTL_DIR}/gene.ttl
     echo "Generating: gda.ttl"
-    tdbquery --loc=${INITIAL_TDB_DIR} \
-      --query=${BASE_PATH}/sparql_queries/optimized_construct/gda.rq 1> ${TTL_DIR}/gda.ttl
+    tdbquery --loc=${INITIAL_TDB_DIR} --query=${BASE_PATH}/sparql_queries/optimized_construct/gda.rq 1> ${TTL_DIR}/gda.ttl
     echo "Generating: pubmed.ttl"
-    tdbquery --loc=${INITIAL_TDB_DIR} \
-      --query=${BASE_PATH}/sparql_queries/optimized_construct/pubmed.rq 1> ${TTL_DIR}/pubmed.ttl
+    tdbquery --loc=${INITIAL_TDB_DIR} --query=${BASE_PATH}/sparql_queries/optimized_construct/pubmed.rq 1> ${TTL_DIR}/pubmed.ttl
     echo "Generating: source.ttl"
-    tdbquery --loc=${INITIAL_TDB_DIR} \
-      --query=${BASE_PATH}/sparql_queries/optimized_construct/source.rq 1> ${TTL_DIR}/source.ttl
+    tdbquery --loc=${INITIAL_TDB_DIR} --query=${BASE_PATH}/sparql_queries/optimized_construct/source.rq 1> ${TTL_DIR}/source.ttl
 }
 
 mergeOptimizedData() {
@@ -388,10 +369,8 @@ addVersionInformationToDatabaseDir() {
     echo "hdt-java " $(rdf2hdt.sh -version) >> ${FINAL_INFO_FILE}
 
     echo "\n### used database versions ###" >> ${FINAL_INFO_FILE}
-    gawk 'match($0, /<versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/versionInfo>/, arr) {print "HOOM v" arr[1]; exit}' \
-      ${SOURCES_DIR}/owlapi.xml >> ${FINAL_INFO_FILE}
-    gawk 'match($0, /<owl:versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/owl:versionInfo>/, arr) {print "SIO v" arr[1]; exit}' \
-      ${SOURCES_DIR}/sio-release.owl >> ${FINAL_INFO_FILE}
+    gawk 'match($0, /<versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/versionInfo>/, arr) {print "HOOM v" arr[1]; exit}' ${SOURCES_DIR}/owlapi.xml >> ${FINAL_INFO_FILE}
+    gawk 'match($0, /<owl:versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/owl:versionInfo>/, arr) {print "SIO v" arr[1]; exit}' ${SOURCES_DIR}/sio-release.owl >> ${FINAL_INFO_FILE}
     find ${SOURCES_DIR} -type d -not -name ".*" -maxdepth 1 | gawk 'match($0, /(v[0-9]+\.[0-9]+\.[0-9]+)/, arr) {print "DisGeNET " arr[1]}'
 
     # Manually add note in regards to v5.0.0 data from DisGeNET
