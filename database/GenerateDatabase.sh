@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
-#########################################################################
-# Name:       GenerateDatabase.sh                                       #
-# Function:   Generates database for vibe.                              #
-#                                                                       #
-# Usage:      see USAGE variable below or use the -h option             #
-# Developers: Be sure to follow the accompanying README in the same     #
-#             directory when making changes in regards to the data      #
-#             that is being downloaded (or if updating checksums).      #
-#########################################################################
+###########################################################################
+# Name:         GenerateDatabase.sh                                       #
+# Function:     Generates database for vibe.                              #
+#                                                                         #
+# Usage:        see USAGE variable below or use the -h option             #
+# Requirements: see README.md supplied in the same directory              #
+# Developers:   Be sure to follow the accompanying README.md in the same  #
+#               directory when making changes in regards to the data      #
+#               that is being downloaded (or if updating checksums).      #
+###########################################################################
 
 # Defines error echo.
 errcho() { echo "$@" 1>&2; }
@@ -31,17 +32,7 @@ Arguments:
 
 IMPORTANT:  Be sure to run this from the directory where all the data should be created!
 
-            Requires Apache Jena TDB Command-line Utilities to be configured.
-            See https://jena.apache.org/documentation/tools/#setting-up-your-environment for more information.
-
-            Requires hdt-java to be configured.
-            See https://github.com/rdfhdt/hdt-java#compiling for compiling and add it to your class path in .bashrc:
-                export HDTJAVA_HOME=/path/to/hdt-java-package-<version>
-                export PATH=$PATH:$HDTJAVA_HOME/bin
-
-            Requires GNU awk (gawk) to be installed.
-
-            Requires wget to be installed.
+            For more information, please view the README.md that is supplied in the same directory.
 "
 
 # Base paths (to current dir/script).
