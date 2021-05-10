@@ -127,12 +127,7 @@ class GeneDiseaseCollectionRetrievalRunnerIT {
 
         // Collection.
         GeneDiseaseCollection expectedCollection = new GeneDiseaseCollection();
-        for(GeneDiseaseCombination gda:geneDiseaseCombinations.values()) {
-            expectedCollection.add(gda);
-        }
-
-        System.out.println();
-
+        expectedCollection.addAll(geneDiseaseCombinations.values());
 
         runner = new GeneDiseaseCollectionRetrievalRunner(
                 new VibeDatabase(TestData.HDT.getFullPath(), ModelReaderFactory.HDT),
