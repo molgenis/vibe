@@ -37,43 +37,43 @@ main() {
     #Digests the command line arguments.
     while [[ $# -gt 0 ]]
     do
-			key="$1"
-			case $key in
-				--hpo)
-					printMatches "$2" '^obo:HP_' 'hpo.ttl'
-					exit 0
-					;;
-				--orpha)
-					printMatches "$2" '^ordo:Orphanet_' 'hpo.ttl'
-					exit 0
-					;;
-				--pda)
-					printMatches "$2" '^pda:' 'hpo.ttl'
-					exit 0
-					;;
-				--umls)
-					printMatches "$2" '^umls:' 'disease.ttl'
-					exit 0
-					;;
-				--gda)
-					printMatches "$2" '^gda:' 'gda.ttl'
-					exit 0
-					;;
-				--gene)
-					printMatches "$2" '^ncbigene:' 'gene.ttl'
-					exit 0
-					;;
-				--pmid)
-					printMatches "$2" '^pmid:' 'pubmed.ttl'
-					exit 0
-					;;
-				*)    # unknown option
-					shift # argument
-					;;
+      key="$1"
+      case $key in
+        --hpo)
+          printMatches "$2" '^obo:HP_' 'hpo.ttl'
+          exit 0
+          ;;
+        --orpha)
+          printMatches "$2" '^ordo:Orphanet_' 'hpo.ttl'
+          exit 0
+          ;;
+        --pda)
+          printMatches "$2" '^pda:' 'hpo.ttl'
+          exit 0
+          ;;
+        --umls)
+          printMatches "$2" '^umls:' 'disease.ttl'
+          exit 0
+          ;;
+        --gda)
+          printMatches "$2" '^gda:' 'gda.ttl'
+          exit 0
+          ;;
+        --gene)
+          printMatches "$2" '^ncbigene:' 'gene.ttl'
+          exit 0
+          ;;
+        --pmid)
+          printMatches "$2" '^pmid:' 'pubmed.ttl'
+          exit 0
+          ;;
+        *)    # unknown option
+          shift # argument
+          ;;
         esac
     done
 
-		# If no argument found, shows usage.
+    # If no argument found, shows usage.
     echo "$USAGE";
 }
 
@@ -82,11 +82,11 @@ main() {
 #   $2 the prefix to use (for each occurrence of the pattern)
 #   $3 the file to search in
 function printMatches {
-	# Replaces comma with prefix if multiple items are present (comma-separated)
-	adjustedString=$(echo "$1" | sed "s/ *, */|$2/g")
-	adjustedString="$2$adjustedString"
-	echo "### $adjustedString in $3"
-	gawk -v pattern="$adjustedString" '$0 ~ pattern {print_lines=1} print_lines==1 {print} NF==0 {print_lines=0}' "$3"
+  # Replaces comma with prefix if multiple items are present (comma-separated)
+  adjustedString=$(echo "$1" | sed "s/ *, */|$2/g")
+  adjustedString="$2$adjustedString"
+  echo "### $adjustedString in $3"
+  gawk -v pattern="$adjustedString" '$0 ~ pattern {print_lines=1} print_lines==1 {print} NF==0 {print_lines=0}' "$3"
 }
 
 main "$@"

@@ -157,7 +157,7 @@ digestCommandLine() {
       [[ ${doOptimizedTtl} == false ]] && [[ ${doMergeOptimizedTtl} == false ]] &&
       [[ ${doOptimizedDatabase} == false ]] && [[ ${doOptimizedDatabaseArchive} == false ]]
     then
-    	local help=true
+      local help=true
     fi
 
     # Checks if usage is requested.
