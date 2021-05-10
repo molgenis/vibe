@@ -85,21 +85,23 @@ Currently there isn't a bat script that offers automated database creation. Plea
 
 11. Update the value of `DISGENET_VERSION` in `/path/to/vibe/vibe-core/src/test/java/org/molgenis/vibe/core/TestConstants.java`.
 
-12. Run `mvn clean verify` on the project and check for any failing test.
+12. Run `mvn clean install` in `/path/to/vibe/` and check for any failing test.
 
     - If a test fails due to small changes such as a new results, simply fix the unit-test. The `/path/to/vibe/database/TurtleFinder.sh` script can be used for retrieving data in plaint text from the generated `.ttl` files which were generated through `/path/to/vibe/database/GenerateDatabase.sh -4` (be sure to `cd` to the `/path/to/data/vibe-<version>-ttl` directory before using this script).
 
     - If larger problems occur, there might be a breaking change and adjustments to the java-app and/or TDB creation might be required. Be sure to add/update scripts in `/path/to/vibe/database/tdb_comparison/` to reflect the querries used in the vibe-app. 
 
-13. Run `/path/to/vibe/database/GenerateDatabase.sh -7` from the `/path/to/data` directory.
+13. Run the vibe-cli jar with the new database and check whether it still works (in theory this shouldn't cause any issues):  `java -jar /path/to/vibe/vibe-cli/target/vibe-with-dependencies-<version>-SNAPSHOT.jar -t /path/to/data/vibe-5.1.0-hdt/vibe-5.1.0.hdt -w /path/to/hp.owl -p HP:0002996`
 
-14. Run `shasum -a 256 vibe-5.1.0-hdt.tar.gz > /path/to/vibe/database/checksums/database.sha256`
+14. Run `/path/to/vibe/database/GenerateDatabase.sh -7` from the `/path/to/data` directory.
 
-15. Upload the new TDB archive to the download server.
+15. Run `shasum -a 256 vibe-5.1.0-hdt.tar.gz > /path/to/vibe/database/checksums/database.sha256`
 
-16. Test whether `/path/to/vibe/TestsPreprocessor.sh` still functions correctly.
+16. Upload the new TDB archive to the download server.
 
-17. Make a pull-request with the changes.
+17. Test whether `/path/to/vibe/TestsPreprocessor.sh` still functions correctly.
+
+18. Make a pull-request with the changes.
 
 ## F.A.Q.
 
