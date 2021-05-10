@@ -291,7 +291,7 @@ prepareData() {
 
 validateDownloads() {
     echo "######## ######## ######## Validating downloaded files ######## ######## ######## "
-    shasum -a 256 -c ${BASE_PATH}sources_checksums.txt
+    shasum -a 256 -c ${BASE_PATH}checksums/sources.sha256
     if (($? != 0))
     then
         errcho "Checksum for downloaded sources failed. Exiting."

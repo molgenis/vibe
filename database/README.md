@@ -67,7 +67,7 @@ Currently there isn't a bat script that offers automated database creation. Plea
 
 5. Use `cd` to a directory where you want to create the new database (`cd /path/to/data/`) and run `/path/to/vibe/database/GenerateDatabase.sh -1` from there.
 
-6. Go to the newly created directory (`cd /path/to/data/vibe-<version>-sources`), run `shasum -a 256 $(find . -not -path '*/.*' -type f) > path/to/vibe/database/sources_checksums.txt` and check the created output (checksums for all needed files and only those).
+6. Go to the newly created directory (`cd /path/to/data/vibe-<version>-sources`), run `shasum -a 256 $(find . -not -path '*/.*' -type f) > path/to/vibe/database/checksums/sources.sha256` and check the created output (checksums for all needed files and only those).
 
 7. Validate whether `/path/to/vibe/database/LICENSES.md` is still up-to-date, and if not, adjust it.
 
@@ -93,7 +93,7 @@ Currently there isn't a bat script that offers automated database creation. Plea
 
 13. Run `/path/to/vibe/database/GenerateDatabase.sh -7` from the `/path/to/data` directory.
 
-14. Run `shasum -a 256 vibe-5.1.0-hdt.tar.gz > /path/to/vibe/database/database_checksum.txt`
+14. Run `shasum -a 256 vibe-5.1.0-hdt.tar.gz > /path/to/vibe/database/checksums/database.sha256`
 
 15. Upload the new TDB archive to the download server.
 
