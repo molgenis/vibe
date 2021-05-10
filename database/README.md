@@ -77,7 +77,7 @@ Currently there isn't a bat script that offers automated database creation. Plea
 
    - If any error is thrown or the generated output files seem incorrect, a breaking change might exist and adjustments should be made to the process accordingly.
 
-9. Run `/path/to/vibe/database/test/TestOptimizedQueries.sh`.
+9. Run `/path/to/vibe/database/test/TestOptimizedQueries.sh -or /path/to/data/vibe-<version>-sources-tdb/ -op /path/to/data/vibe-<version>-hdt/vibe-<version>.hdt`.
 
    - If it fails, something went wrong in creating the optimized database from the original one as they do not return the exact same information. This might be caused by a breaking change which requires an adjustment to the database creation process.
 
