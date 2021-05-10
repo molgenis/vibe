@@ -18,7 +18,6 @@ errcho() { echo "$@" 1>&2; }
 readonly USAGE="Usage: GenerateDatabase.sh [-h] [-1] [-2] [-3] [-4] [-5]
 Description: Generates database for vibe.
 The process is split into multiple phases which can be chosen individually.
-If no phase is given, runs phase 1-6 one after another.
 
 Arguments:
 -h  --help      Shows this help message.
@@ -153,22 +152,16 @@ digestCommandLine() {
         esac
     done
 
-    # Checks if usage is requested.
-    if [[ ${help} == true ]]; then echo "$USAGE"; exit 0; fi
-
     # If no phase is set, defaults most to true.
     if [[ ${doDownload} == false ]] && [[ ${doPrepare} == false ]] && [[ ${doOriginalTdb} == false ]] &&
       [[ ${doOptimizedTtl} == false ]] && [[ ${doMergeOptimizedTtl} == false ]] &&
       [[ ${doOptimizedDatabase} == false ]] && [[ ${doOptimizedDatabaseArchive} == false ]]
     then
-        doDownload=true
-        doPrepare=true
-        doOriginalTdb=true
-        doOptimizedTtl=true
-        doMergeOptimizedTtl=true
-        doOptimizedDatabase=true
-        # doOptimizedDatabaseArchive stays false
+    	local help=true
     fi
+
+    # Checks if usage is requested.
+    if [[ ${help} == true ]]; then echo "$USAGE"; exit 0; fi
 
     # Make phase variables readonly.
     readonly doDownload=${doDownload}
