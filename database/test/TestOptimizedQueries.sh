@@ -31,7 +31,7 @@ IMPORTANT:  Requires Apache Jena TDB Command-line Utilities to be configured.
 BASE_PATH=$(realpath "$0") && readonly BASE_PATH=${BASE_PATH%/*}
 
 main() {
-  digestCommandLine $@
+  digestCommandLine "$@"
   runTests
 }
 
@@ -98,4 +98,4 @@ runTests() {
   shasum -a 256 -c <<< "$CHECKSUM_GENES_FOR_PHENOTYPES  test/genes_for_hpo-optimized.tsv" # double space is needed! Second space indicates text file type.
 }
 
-main $@
+main "$@"

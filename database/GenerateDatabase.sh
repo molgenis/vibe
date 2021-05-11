@@ -59,7 +59,7 @@ readonly FINAL_INFO_FILE=${FINAL_HDT_DIR}/"info.txt"
 readonly THREADS=$(nproc) # available to process (no `-all`)
 
 main() {
-    digestCommandLine $@
+    digestCommandLine "$@"
     
     if [[ ${doDownload} == true ]]
     then
@@ -368,4 +368,4 @@ createArchive() {
     tar -czvf ${FINAL_HDT_ARCHIVE} ${FINAL_HDT_DIR}
 }
 
-main $@
+main "$@"
