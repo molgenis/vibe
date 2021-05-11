@@ -28,7 +28,7 @@ IMPORTANT:  Requires Apache Jena TDB Command-line Utilities to be configured.
 "
 
 # Base path (to script).
-readonly BASE_PATH=$(sed 's/TestOptimizedQueries.sh$//' <<< $0 | sed -e 's/^$/.\//g')
+BASE_PATH=$(realpath "$0") && readonly BASE_PATH=${BASE_PATH%/*}
 
 main() {
   digestCommandLine $@

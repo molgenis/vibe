@@ -36,7 +36,7 @@ IMPORTANT:  Be sure to run this from the directory where all the data should be 
 
 # Base paths (to current dir/script).
 readonly CURRENT_PATH=$(pwd)
-readonly BASE_PATH=$(sed 's/GenerateDatabase.sh$//' <<< $0 | sed -e 's/^$/.\//g')
+BASE_PATH=$(realpath "$0") && readonly BASE_PATH=${BASE_PATH%/*}
 
 # Retrieves vibe version from pom.xml file.
 cd ${BASE_PATH}
@@ -284,7 +284,7 @@ prepareData() {
 
 validateDownloads() {
     echo "######## ######## ######## Validating downloaded files ######## ######## ######## "
-    shasum -a 256 -c ${BASE_PATH}checksums/sources.sha256
+    shasum -a 256 -c ${BASE_PATH}/checksums/sources.sha256
     if (($? != 0))
     then
         errcho "Checksum for downloaded sources failed. Exiting."

@@ -28,11 +28,6 @@ Arguments:
 -pmid           Get the triples for this pmid  (format: 25413698).
 "
 
-# Base paths (to current dir/script).
-readonly CURRENT_PATH=$(pwd)
-readonly BASE_PATH=$(sed 's/GenerateDatabase.sh$//' <<< $0 | sed -e 's/^$/.\//g')
-ADD_PREFIX=1
-
 main() {
     #Digests the command line arguments.
     while [[ $# -gt 0 ]]
