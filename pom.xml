@@ -46,7 +46,7 @@
 
     <properties>
         <!-- vibe database information (requirement: vibe-database.version <= project.version) -->
-        <vibe-database.version>5.0.0</vibe-database.version>
+        <vibe-database.version>5.1.0</vibe-database.version>
         <vibe-database.archive>vibe-${vibe-database.version}-hdt.tar.gz</vibe-database.archive>
         <vibe-database.download>https://downloads.molgeniscloud.org/downloads/vibe/${vibe-database.archive}</vibe-database.download>
 

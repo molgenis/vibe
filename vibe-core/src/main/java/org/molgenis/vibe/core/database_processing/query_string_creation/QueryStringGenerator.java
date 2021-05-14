@@ -46,8 +46,8 @@ public final class QueryStringGenerator {
             "PREFIX hgnc: <http://identifiers.org/hgnc.symbol/> # DisGeNET\n" +
             "PREFIX ordo: <http://www.orpha.net/ORDO/> # DisGeNET / Orphanet\n" +
             "PREFIX hoom: <http://www.semanticweb.org/ontology/HOOM#> # Orphanet\n" +
-            "PREFIX void5: <http://rdf.disgenet.org/v5.0.0/void/> # DisGeNET\n" +
-            "PREFIX void6: <http://rdf.disgenet.org/v6.0.0/void/> # DisGeNET\n" +
+            "PREFIX dvoid: <http://rdf.disgenet.org/v7.0.0/void/> # DisGeNET\n" +
+            "PREFIX dvoid5: <http://rdf.disgenet.org/v5.0.0/void/> # DisGeNET\n" +
             "PREFIX pmid: <http://identifiers.org/pubmed/> # DisGeNET\n";
 
     /**

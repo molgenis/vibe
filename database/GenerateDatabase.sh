@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
-#########################################################################
-# Name:     GenerateDatabase.sh                                         #
-# Function: Generates database for vibe.                                #
-#                                                                       #
-# Usage:    see USAGE variable below or use the -h option               #
-#########################################################################
+###########################################################################
+# Name:         GenerateDatabase.sh                                       #
+# Function:     Generates database for vibe.                              #
+#                                                                         #
+# Usage:        see USAGE variable below or use the -h option             #
+# Requirements: see README.md supplied in the same directory              #
+# Developers:   Be sure to follow the accompanying README.md in the same  #
+#               directory when making changes in regards to the data      #
+#               that is being downloaded (or if updating checksums).      #
+###########################################################################
 
 # Defines error echo.
 errcho() { echo "$@" 1>&2; }
@@ -14,33 +18,25 @@ errcho() { echo "$@" 1>&2; }
 readonly USAGE="Usage: GenerateDatabase.sh [-h] [-1] [-2] [-3] [-4] [-5]
 Description: Generates database for vibe.
 The process is split into multiple phases which can be chosen individually.
-If no phase is given, runs phase 1-4 one after another.
 
 Arguments:
 -h  --help      Shows this help message.
 -1              Download sources.
--2              Create initial TDB.
--3              Create optimized TTL files.
--4              Merge optimized TTL files.
--5              Create HDT + index + adds other relevant files to dir.
--6              Create distributable archive.
+-2              Validates/prepares sources.
+-3              Create initial TDB.
+-4              Create optimized TTL files.
+-5              Merge optimized TTL files.
+-6              Create HDT + index + adds other relevant files to dir.
+-7              Create distributable archive.
 
 IMPORTANT:  Be sure to run this from the directory where all the data should be created!
 
-            Requires Apache Jena TDB Command-line Utilities to be configured.
-            See https://jena.apache.org/documentation/tools/#setting-up-your-environment for more information.
-
-            Requires hdt-java to be configured.
-            See https://github.com/rdfhdt/hdt-java#compiling for compiling and add it to your class path in .bashrc:
-                export HDTJAVA_HOME=/path/to/hdt-java-package-<version>
-                export PATH=$PATH:$HDTJAVA_HOME/bin
-
-            Requires GNU awk (gawk) to be installed.
+            For more information, please view the README.md that is supplied in the same directory.
 "
 
 # Base paths (to current dir/script).
 readonly CURRENT_PATH=$(pwd)
-readonly BASE_PATH=$(sed 's/GenerateDatabase.sh$//' <<< $0 | sed -e 's/^$/.\//g')
+BASE_PATH=$(realpath "$0") && readonly BASE_PATH=${BASE_PATH%/*}
 
 # Retrieves vibe version from pom.xml file.
 cd ${BASE_PATH}
@@ -59,10 +55,18 @@ readonly FINAL_TTL_FILE=vibe-${VIBE_VERSION}.ttl
 readonly FINAL_HDT_FILE=${FINAL_HDT_DIR}/vibe-${VIBE_VERSION}.hdt # Be sure to adjust changes in pom file as well.
 readonly FINAL_INFO_FILE=${FINAL_HDT_DIR}/"info.txt"
 
+# Retrieve system information.
+readonly THREADS=$(nproc) # available to process (no `-all`)
+
 main() {
-    digestCommandLine $@
+    digestCommandLine "$@"
     
     if [[ ${doDownload} == true ]]
+    then
+        downloadData
+    fi
+
+    if [[ ${doPrepare} == true ]]
     then
         prepareData
     fi
@@ -98,6 +102,7 @@ main() {
 digestCommandLine() {
     # Sets defaults for phases.
     doDownload=false
+    doPrepare=false
     doOriginalTdb=false
     doOptimizedTtl=false
     doMergeOptimizedTtl=false
@@ -114,22 +119,26 @@ digestCommandLine() {
             shift # argument
             ;;
             -2)
-            doOriginalTdb=true
+            doPrepare=true
             shift # argument
             ;;
             -3)
-            doOptimizedTtl=true
+            doOriginalTdb=true
             shift # argument
             ;;
             -4)
-            doMergeOptimizedTtl=true
+            doOptimizedTtl=true
             shift # argument
             ;;
             -5)
-            doOptimizedDatabase=true
+            doMergeOptimizedTtl=true
             shift # argument
             ;;
             -6)
+            doOptimizedDatabase=true
+            shift # argument
+            ;;
+            -7)
             doOptimizedDatabaseArchive=true
             shift # argument
             ;;
@@ -143,24 +152,20 @@ digestCommandLine() {
         esac
     done
 
+    # If no phase is set, defaults most to true.
+    if [[ ${doDownload} == false ]] && [[ ${doPrepare} == false ]] && [[ ${doOriginalTdb} == false ]] &&
+      [[ ${doOptimizedTtl} == false ]] && [[ ${doMergeOptimizedTtl} == false ]] &&
+      [[ ${doOptimizedDatabase} == false ]] && [[ ${doOptimizedDatabaseArchive} == false ]]
+    then
+      local help=true
+    fi
+
     # Checks if usage is requested.
     if [[ ${help} == true ]]; then echo "$USAGE"; exit 0; fi
 
-    # If no phase is set, defaults all to true.
-    if [[ ${doDownload} == false ]] && [[ ${doOriginalTdb} == false ]] && [[ ${doOptimizedTtl} == false ]] &&
-      [[ ${doMergeOptimizedTtl} == false ]] && [[ ${doOptimizedDatabase} == false ]] &&
-      [[ ${doOptimizedDatabaseArchive} == false ]]
-    then
-        doDownload=true
-        doOriginalTdb=true
-        doOptimizedTtl=true
-        doMergeOptimizedTtl=true
-        doOptimizedDatabase=true
-        # doOptimizedDatabaseArchive stays false
-    fi
-
     # Make phase variables readonly.
     readonly doDownload=${doDownload}
+    readonly doPrepare=${doPrepare}
     readonly doOriginalTdb=${doOriginalTdb}
     readonly doOptimizedTtl=${doOptimizedTtl}
     readonly doMergeOptimizedTtl=${doMergeOptimizedTtl}
@@ -169,78 +174,117 @@ digestCommandLine() {
 
     # Prints for each phase whether it will be run.
     echo "######## ######## ######## Selected phases ######## ######## ########"
-    echo "download:${doDownload}\ninitial TDB:${doOriginalTdb}\noptimized TTL:${doOptimizedTtl}\nmerge optimized TTL:${doMergeOptimizedTtl}\noptimized database:${doOptimizedDatabase}\narchive:${doOptimizedDatabaseArchive}"
+    echo "download:${doDownload}"
+    echo "prepare:${doPrepare}"
+    echo "initial TDB:${doOriginalTdb}"
+    echo "optimized TTL:${doOptimizedTtl}"
+    echo "nmerge optimized TTL:${doMergeOptimizedTtl}"
+    echo "optimized database:${doOptimizedDatabase}"
+    echo "archive:${doOptimizedDatabaseArchive}"
 
     # Check whether directories/files might already exist.
-    validateDataPresence
+    validatePhasesRunnable
 }
 
-validateDataPresence() {
+validatePhasesRunnable() {
     echo "######## ######## ######## Checking existence phase-specific directories ######## ######## ########"
     # Done separately (instead of integrated into main) so that first all necessary directories are
     # checked whether they already exist before anything is actually done.
     
     # Boolean for when a directory/file which should be created already exists.
-    local pathExists=false
+    local phaseRunnableError=false
 
     # Checks directories for the different phases.
     if [[ ${doDownload} == true ]]
     then
-        if [ -d "$SOURCES_DIR" ]; then pathExists=true; errcho "${SOURCES_DIR} already exists."; fi
+        # This phase check.
+        if [ -d "$SOURCES_DIR" ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} already exists."; fi
+    fi
+
+    if [[ ${doPrepare} == true ]]
+    then
+        # Previous phase check.
+        if [ ${doDownload} == false ] && [ ! -d "$SOURCES_DIR" ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} does not exists."; fi
+        # This phase check.
+        if [ -f "$SOURCES_DIR"/.prepared ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} already prepared."; fi
     fi
 
     if [[ ${doOriginalTdb} == true ]]
     then
-        if [ -d "$INITIAL_TDB_DIR" ]; then pathExists=true; errcho "${INITIAL_TDB_DIR} already exists."; fi
+        # Previous phase check.
+        if [ ${doPrepare} == false ] && [ ! -f "$SOURCES_DIR"/.prepared ]; then phaseRunnableError=true; errcho "${SOURCES_DIR} not yet prepared."; fi
+        # This phase check.
+        if [ -d "$INITIAL_TDB_DIR" ]; then phaseRunnableError=true; errcho "${INITIAL_TDB_DIR} already exists."; fi
     fi
 
     if [[ ${doOptimizedTtl} == true ]]
     then
-        if [ -d "$TTL_DIR" ]; then pathExists=true; errcho "${TTL_DIR} already exists."; fi
+        # Previous phase check.
+        if [ ${doOriginalTdb} == false ] && [ ! -d "$INITIAL_TDB_DIR" ]; then phaseRunnableError=true; errcho "${INITIAL_TDB_DIR} does not exists."; fi
+        # This phase check.
+        if [ -d "$TTL_DIR" ]; then phaseRunnableError=true; errcho "${TTL_DIR} already exists."; fi
     fi
 
     if [[ ${doMergeOptimizedTtl} == true ]]
     then
-        if [ -f "$FINAL_TTL_FILE" ]; then pathExists=true; errcho "${FINAL_TTL_FILE} already exists."; fi
+        # Previous phase check.
+        if [ ${doOptimizedTtl} == false ] && [ ! -d "$TTL_DIR" ]; then phaseRunnableError=true; errcho "${TTL_DIR} does not exists."; fi
+        # This phase check.
+        if [ -f "$FINAL_TTL_FILE" ]; then phaseRunnableError=true; errcho "${FINAL_TTL_FILE} already exists."; fi
     fi
 
     if [[ ${doOptimizedDatabase} == true ]]
     then
-        if [ -d "$FINAL_HDT_DIR" ]; then pathExists=true; errcho "${FINAL_HDT_DIR} already exists."; fi
+        # Previous phase check.
+        if [ ${doMergeOptimizedTtl} == false ] && [ ! -f "$FINAL_TTL_FILE" ]; then phaseRunnableError=true; errcho "${FINAL_TTL_FILE} does not exists."; fi
+        # This phase check.
+        if [ -d "$FINAL_HDT_DIR" ]; then phaseRunnableError=true; errcho "${FINAL_HDT_DIR} already exists."; fi
     fi
 
     if [[ ${doOptimizedDatabaseArchive} == true ]]
     then
-        if [ -d "$FINAL_HDT_ARCHIVE" ]; then pathExists=true; errcho "${FINAL_HDT_ARCHIVE} already exists."; fi
+        # Previous phase check.
+        if [ ${doOptimizedDatabase} == false ] && [ ! -d "$FINAL_HDT_DIR" ]; then phaseRunnableError=true; errcho "${FINAL_HDT_DIR} does not exists."; fi
+        # This phase check.
+        if [ -d "$FINAL_HDT_ARCHIVE" ]; then phaseRunnableError=true; errcho "${FINAL_HDT_ARCHIVE} already exists."; fi
     fi
 
     # If a directory already exists, exits script.
-    if [[ ${pathExists} == true ]]; then errcho "Exiting."; exit 1; fi
+    if [[ ${phaseRunnableError} == true ]]; then errcho "Exiting."; exit 1; fi
 }
 
-prepareData() {
+downloadData() {
+    echo "######## ######## ######## Downloading files ######## ######## ########"
+
+    # Create & go to download dir.
     mkdir ${SOURCES_DIR}
     cd ${SOURCES_DIR}
-    DownloadData
-    validateDownloads
-    unpackDownloadedArchives
+
+    # DisGeNET (general)
+    wget --no-verbose --show-progress -r --no-parent --no-host-directories --cut-dirs=1 -A '*.ttl.gz' -R '*-dump.*' 'http://rdf.disgenet.org/download/v7.0.0/'
+    # DisGeNET (data from v5.0.0 for phenotype-disease associations)
+    wget --no-verbose --show-progress -r --no-parent --no-host-directories --cut-dirs=1 -A 'pda.ttl.tar.gz,phenotype.ttl.tar.gz,void.ttl.tar.gz' 'http://rdf.disgenet.org/download/v5.0.0/'
+    # Semanticscience Integrated Ontology
+    wget --no-verbose --show-progress 'https://raw.githubusercontent.com/MaastrichtU-IDS/semanticscience/65336c5ba45d4a4cd36b8bec2042c2786bc4ca1f/ontology/sio/release/sio-release.owl'
+    # Orphadata HOOM
+    wget --no-verbose --show-progress -O owlapi.xml 'http://data.bioontology.org/ontologies/HOOM/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf'
+
+    # Returns to original dir.
     cd ${CURRENT_PATH}
 }
 
-DownloadData() {
-    # Links to specific versions instead of latest. If changed, validate if licenses still are correct (and adjust LICENSES.md if needed).
-    echo "######## ######## ######## Downloading files ######## ######## ########"
-    curl -O 'http://rdf.disgenet.org/download/v6.0.0/disgenetv6.0-rdf-v6.0.0-dump.tgz'
-    curl -O 'http://rdf.disgenet.org/download/v5.0.0/pda.ttl.tar.gz'
-    curl -O 'http://rdf.disgenet.org/download/v5.0.0/phenotype.ttl.tar.gz'
-    curl -O 'http://rdf.disgenet.org/download/v5.0.0/void.ttl.tar.gz'
-    curl -O 'https://raw.githubusercontent.com/MaastrichtU-IDS/semanticscience/e8231fe010279bec32423c74c9a8b8d685c56a12/ontology/sio/release/sio-release.owl'
-    curl -o owlapi.xml 'http://data.bioontology.org/ontologies/HOOM/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf'
+prepareData() {
+    # Validates downloaded files.
+    cd ${SOURCES_DIR}
+    validateDownloads
+    unpackDownloadedArchives
+    touch .prepared
+    cd ${CURRENT_PATH}
 }
 
 validateDownloads() {
     echo "######## ######## ######## Validating downloaded files ######## ######## ######## "
-    shasum -a 256 -c ${BASE_PATH}sources_checksums.txt
+    shasum -a 256 -c ${BASE_PATH}/checksums/sources.sha256
     if (($? != 0))
     then
         errcho "Checksum for downloaded sources failed. Exiting."
@@ -250,17 +294,20 @@ validateDownloads() {
 
 unpackDownloadedArchives() {
     echo "######## ######## ######## Unpacking archives ######## ######## ########"
-    mkdir disgenet_v6
-    mkdir disgenet_v5
-    tar -xvzf disgenetv6.0-rdf-v6.0.0-dump.tgz -C disgenet_v6
-    tar -xvzf pda.ttl.tar.gz -C disgenet_v5
-    tar -xvzf phenotype.ttl.tar.gz -C disgenet_v5
-    tar -xvzf void.ttl.tar.gz -C disgenet_v5
+
+    # Extract gzip archives.
+    find . -name "*.gz" -print0 | xargs -0 -P ${THREADS} -n 1 gunzip
+
+    # Untar v5.0.0 data.
+    cd v5.0.0
+    find . -name '*.tar' -print0 | xargs -0 -P ${THREADS} -n 1 tar -xvf
+    rm *.tar
+    cd ../
 }
 
 createInitialTdb() {
     echo "######## ######## ######## Creating initial TDB ######## ######## ########"
-    tdbloader2 --loc ${INITIAL_TDB_DIR} ${SOURCES_DIR}/disgenet_v6/*.ttl ${SOURCES_DIR}/disgenet_v5/*.ttl ${SOURCES_DIR}/sio-release.owl ${SOURCES_DIR}/owlapi.xml
+    tdbloader2 --loc ${INITIAL_TDB_DIR} ${SOURCES_DIR}/sio-release.owl ${SOURCES_DIR}/owlapi.xml $(find ${SOURCES_DIR} -name '*.ttl')
 }
 
 createOptimizedTtlFiles() {
@@ -306,13 +353,14 @@ addVersionInformationToDatabaseDir() {
     echo "hdt-java " $(rdf2hdt.sh -version) >> ${FINAL_INFO_FILE}
 
     echo "\n### used database versions ###" >> ${FINAL_INFO_FILE}
-    gawk 'match($0, /<versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/versionInfo>/, arr) {print "HOOM v" arr[1]; exit}' \
-      ${SOURCES_DIR}/owlapi.xml >> ${FINAL_INFO_FILE}
-    gawk 'match($0, /<owl:versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/owl:versionInfo>/, arr) {print "SIO v" arr[1]; exit}' \
-      ${SOURCES_DIR}/sio-release.owl >> ${FINAL_INFO_FILE}
-    ls -l ${SOURCES_DIR} | gawk 'match($0, /disgenetv[0-9.]+-rdf-(v[0-9.]+)-dump\.tgz/, arr) {print "DisGeNET " arr[1]}' \
-     >> ${FINAL_INFO_FILE}
-    printf "DisGeNET v5.0.0 (pda.ttl, phenotype.ttl & void.ttl only)" >> ${FINAL_INFO_FILE} # For the literature HPO-DISEASE associations
+    gawk 'match($0, /<versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/versionInfo>/, arr) {print "HOOM v" arr[1]; exit}' ${SOURCES_DIR}/owlapi.xml >> ${FINAL_INFO_FILE}
+    gawk 'match($0, /<owl:versionInfo rdf:datatype="http:\/\/www.w3.org\/2001\/XMLSchema#string">([0-9.]+)<\/owl:versionInfo>/, arr) {print "SIO v" arr[1]; exit}' ${SOURCES_DIR}/sio-release.owl >> ${FINAL_INFO_FILE}
+
+    # Uses available directories in sources dir to define used DisGeNET version (excludes v5.0.0 due to manual defining that).
+    find ${SOURCES_DIR} -type d -not -name ".*" -a -not -name 'v5.0.0' -maxdepth 1 | gawk 'match($0, /(v[0-9]+\.[0-9]+\.[0-9]+)/, arr) {print "DisGeNET " arr[1]}' >> ${FINAL_INFO_FILE}
+
+    # Manually add DisGeNET v5.0.0
+    printf "DisGeNET v5.0.0: pda.ttl, phenotype.ttl & void.ttl only" >> ${FINAL_INFO_FILE}
 }
 
 createArchive() {
@@ -320,4 +368,4 @@ createArchive() {
     tar -czvf ${FINAL_HDT_ARCHIVE} ${FINAL_HDT_DIR}
 }
 
-main $@
+main "$@"

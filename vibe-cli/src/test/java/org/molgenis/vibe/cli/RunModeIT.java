@@ -78,7 +78,7 @@ class RunModeIT {
         // Main goal is to ensure no errors are thrown, but output validation purely for gene order is present as well.
         // Based on: GeneDiseaseCollectionRetrievalRunnerIT if sorted by GenePrioritizedOutputFormatWriterFactory.SIMPLE
         RunMode.GENES_FOR_PHENOTYPES.run(mockedVibeOptions);
-        Assertions.assertEquals("29123,56172,2697,286,479", outContent.toString());
+        Assertions.assertEquals("29123,56172,2697,2475,23522,286,23028", outContent.toString());
     }
 
     @Test
@@ -101,6 +101,6 @@ class RunModeIT {
         // https://github.com/molgenis/vibe/issues/25 gets implemented.
         // Based on: GeneDiseaseCollectionRetrievalRunnerIT if sorted by GenePrioritizedOutputFormatWriterFactory.SIMPLE
         RunMode.GENES_FOR_PHENOTYPES_WITH_ASSOCIATED_PHENOTYPES.run(mockedVibeOptions);
-        Assertions.assertEquals("29123,56172,2697,286,479", outContent.toString());
+        Assertions.assertEquals("29123,56172,2697,2475,23522,286,23028", outContent.toString());
     }
 }

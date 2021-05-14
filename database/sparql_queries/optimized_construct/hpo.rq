@@ -27,8 +27,8 @@ PREFIX gda: <http://rdf.disgenet.org/resource/gda/> # DisGeNET
 PREFIX hgnc: <http://identifiers.org/hgnc.symbol/> # DisGeNET
 PREFIX ordo: <http://www.orpha.net/ORDO/> # DisGeNET / Orphanet
 PREFIX hoom: <http://www.semanticweb.org/ontology/HOOM#> # Orphanet
-PREFIX void5: <http://rdf.disgenet.org/v5.0.0/void/> # DisGeNET
-PREFIX void6: <http://rdf.disgenet.org/v6.0.0/void/> # DisGeNET
+PREFIX dvoid: <http://rdf.disgenet.org/v7.0.0/void/> # DisGeNET
+PREFIX dvoid5: <http://rdf.disgenet.org/v5.0.0/void/> # DisGeNET
 PREFIX pmid: <http://identifiers.org/pubmed/> # DisGeNET
 
 # Query.
@@ -82,6 +82,6 @@ WHERE {
 		}
 		?orphanetDisease skos:exactMatch ?orphanet .
 
-		FILTER EXISTS { ?orphanetDisease rdf:type ncit:C7057 ; void:inDataset <http://rdf.disgenet.org/v6.0.0/void/disease> . }
+		FILTER EXISTS { ?orphanetDisease rdf:type ncit:C7057 ; void:inDataset dvoid:disease . }
 	}
 }
