@@ -27,7 +27,7 @@ public class VibeApplication {
                     executeRunMode(vibeOptions);
                 } else { // Errors caused by invalid options configuration.
                     printUnexpectedExceptionOccurred();
-                    vibeOptions.toString();
+                    System.err.println(vibeOptions.toString());
                 }
             } catch (ParseException e) { // Errors generated during options parsing.
                 System.err.println(e.getLocalizedMessage());
