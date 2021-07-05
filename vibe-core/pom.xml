@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.molgenis</groupId>
         <artifactId>vibe</artifactId>
-        <version>5.1.1-SNAPSHOT</version>
+        <version>5.1.1</version>
     </parent>
     <artifactId>vibe-core</artifactId>
     <packaging>jar</packaging>
