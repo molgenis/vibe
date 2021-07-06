@@ -207,6 +207,7 @@
                         <algorithms>
                             <!-- see: https://en.wikipedia.org/wiki/Secure_Hash_Algorithms -->
                             <algorithm>MD5</algorithm>
+                            <algorithm>SHA-256</algorithm>
                             <algorithm>SHA-512</algorithm>
                             <algorithm>SHA3-512</algorithm>
                         </algorithms>
