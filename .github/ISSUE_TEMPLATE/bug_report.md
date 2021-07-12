@@ -6,7 +6,8 @@ labels: bug
 assignees: ''
 ---
 
-### General information (please complete the following information)
+### General information
+Please fill in the following:
 - OS + version: [e.g. macOS 10.15.7]
 - Vibe version¹: [e.g. 5.1]
 - Shell²: [e.g. bash]

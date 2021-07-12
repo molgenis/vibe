@@ -1,18 +1,18 @@
-## Changes
+### Changes
 - Implemented feature [...]
 - Fixed bug [...]
 
-## Important notes
+### Important notes
 Additional information about made changes, known issues, etc.
 
-## Checklists
-Please update the checklist when steps are completed.
+### Checklists
+Please update the checklists when steps are completed.
 
-### Before merge
+##### Before merge
 - [ ] Functionality works & meets specs
 - [ ] Code reviewed
 - [ ] Documentation was updated
 
-### After merge
+##### After merge
 - [ ] Added feature/fix to draft release notes
 - [ ] Removed merged branches
