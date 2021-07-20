@@ -3,6 +3,7 @@ package org.molgenis.vibe.core;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.molgenis.vibe.core.exceptions.InvalidStringFormatException;
 import org.molgenis.vibe.core.formats.*;
 import org.molgenis.vibe.core.io.input.ModelReaderFactory;
 import org.molgenis.vibe.core.io.input.VibeDatabase;
@@ -139,5 +140,19 @@ class GeneDiseaseCollectionRetrievalRunnerIT {
             () -> Assertions.assertEquals(expectedCollection, actualCollection),
             () -> Assertions.assertTrue(expectedCollection.allFieldsEquals(actualCollection))
         );
+    }
+
+    /**
+     * Based on DisGeNET v7.0.0. A future release of DisGeNET should make this test obsolete.
+     * @throws IOException
+     */
+    @Test
+    void testPhenotypeReturningInvalidHgncSymbol() throws IOException {
+        runner = new GeneDiseaseCollectionRetrievalRunner(
+                new VibeDatabase(TestData.HDT.getFullPath(), ModelReaderFactory.HDT),
+                new HashSet<>(Arrays.asList(new Phenotype("hp:0002664")))
+        );
+
+        Assertions.assertDoesNotThrow(() -> runner.call(), String.valueOf(InvalidStringFormatException.class));
     }
 }

@@ -195,4 +195,10 @@ class GeneSymbolTest {
                 () -> Assertions.assertEquals(URI.create("http://identifiers.org/hgnc.symbol/GS1-600G8.3"), symbol.getUri())
         );
     }
+
+    @Test
+    void useInvalidHgncSymbolThatShouldBeAcceptedDueToDisgenetBug() {
+        Assertions.assertDoesNotThrow(() -> new GeneSymbol(URI.create("http://identifiers.org/hgnc.symbol/MCS+9.7")),
+                String.valueOf(InvalidStringFormatException.class));
+    }
 }
