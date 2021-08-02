@@ -1,0 +1,10 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sio: <http://semanticscience.org/resource/>
+PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
+
+SELECT ?gene ?symbol
+WHERE {
+    ?gene rdf:type ncit:C16612 ;
+    sio:SIO_000205 ?symbol .
+}
+ORDER BY ?gene

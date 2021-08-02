@@ -21,7 +21,12 @@ tdbquery --time --loc=/path/to/initial/TDB --query=/path/to/vibe/database/sparql
 **NOTE:** As some of the GDAs within DisGeNET were inferred from the VDAs stored in the dataset, duplicate results might be present. See also "Inferred Data" on http://disgenet.org/dbinfo.
 
 
+## For optimized HDT
+### All stored gene IDs & their symbol
 
+```bash
+hdtsparql.sh vibe-<version>-hdt/vibe-<version>.hdt "$(cat /path/to/database/sparql_queries/other/optimized_database/gene_symbols.rq)" 1> output.tsv
+```
 
 
 
