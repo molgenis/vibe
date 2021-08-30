@@ -1,11 +1,10 @@
-package org.molgenis.vibe.core.formats.serialization;
+package org.molgenis.vibe.core.formats;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.molgenis.vibe.core.formats.*;
 
 import java.net.URI;
 import java.util.Arrays;
