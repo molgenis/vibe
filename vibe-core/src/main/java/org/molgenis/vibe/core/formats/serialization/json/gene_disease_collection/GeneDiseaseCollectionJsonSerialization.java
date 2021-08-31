@@ -1,10 +1,13 @@
-package org.molgenis.vibe.core.formats;
+package org.molgenis.vibe.core.formats.serialization.json.gene_disease_collection;
+
+import org.molgenis.vibe.core.formats.Disease;
+import org.molgenis.vibe.core.formats.Gene;
+import org.molgenis.vibe.core.formats.GeneSymbol;
 
 /**
- * @deprecated will be replaced with {@link org.molgenis.vibe.core.formats.serialization.json.GeneDiseaseCollectionJsonSerialization}
+ * Contains all constants to be used in child classes for (de)serialization.
  */
-@Deprecated
-public abstract class GeneDiseaseCollectionJsonSerialization {
+abstract class GeneDiseaseCollectionJsonSerialization {
     // Primary key for all combinations.
     protected static final String COMBINATIONS_KEY = "combinations";
     protected static final String COMBINATION_GENE_KEY = Gene.ID_PREFIX;
