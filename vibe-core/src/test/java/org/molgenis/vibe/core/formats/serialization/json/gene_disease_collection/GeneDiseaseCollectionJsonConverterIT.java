@@ -33,24 +33,25 @@ public class GeneDiseaseCollectionJsonConverterIT extends GeneDiseaseCollectionJ
      */
     @Test
     void testStreamSerializationWithStreamDeserialization() throws IOException {
-        PipedInputStream in = new PipedInputStream();
-        PipedOutputStream out = new PipedOutputStream(in);
-
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            GeneDiseaseCollectionJsonConverter.writeJsonStream(out, expectedGeneDiseaseCollection);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+        try(PipedInputStream in = new PipedInputStream()) {
+            try(PipedOutputStream out = new PipedOutputStream(in)) {
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    GeneDiseaseCollectionJsonConverter.writeJsonStream(out, expectedGeneDiseaseCollection);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
-                    }
-                }
-        ).start();
+                ).start();
 
-        GeneDiseaseCollection returnedCollection = GeneDiseaseCollectionJsonConverter.readJsonStream(in);
-        Assertions.assertTrue(returnedCollection.allFieldsEquals(expectedGeneDiseaseCollection));
+                GeneDiseaseCollection returnedCollection = GeneDiseaseCollectionJsonConverter.readJsonStream(in);
+                Assertions.assertTrue(returnedCollection.allFieldsEquals(expectedGeneDiseaseCollection));
+            }
+        }
     }
 
     @Test
