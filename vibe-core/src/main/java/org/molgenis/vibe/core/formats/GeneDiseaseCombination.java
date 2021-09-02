@@ -40,7 +40,7 @@ public class GeneDiseaseCombination extends BiologicalEntityCombination<Gene, Di
         return getT2();
     }
 
-    public double getDisgenetScore() {
+    public Double getDisgenetScore() {
         return disgenetScore;
     }
 
@@ -165,11 +165,41 @@ public class GeneDiseaseCombination extends BiologicalEntityCombination<Gene, Di
     }
 
     /**
+     * Sets all values for a single {@link Source} that does have pubmed evidence.
+     * @param source
+     * @param count
+     * @param pubmedEvidence
+     * @throws IllegalArgumentException if {@code count < pubmedEvidence.size()}
+     */
+    public void set(Source source, int count, Set<PubmedEvidence> pubmedEvidence) {
+        // Count should be equal or higher than number of pubmedEvidence present.
+        if(count < pubmedEvidence.size()) {
+            throw new IllegalArgumentException("count can not be lower than pubmedEvidence size");
+        }
+        // Sets the data for source.
+        this.sourcesCount.put(source, count);
+        this.pubmedEvidence.put(source, pubmedEvidence);
+    }
+
+    /**
+     * Sets all values for a single {@link Source} that does not have a single pubmed evidence. Removes any evidence
+     * for {@link Source} if present!
+     * @param source
+     * @param count
+     */
+    public void set(Source source, int count) {
+        pubmedEvidence.remove(source);
+        sourcesCount.put(source, count);
+    }
+
+    /**
      * Set {@code count} for a {@link Source}. To prevent wrongly setting information,
      * incrementing through {@link #add(Source)} is suggested instead.
      * @param source the {@link Source} for which the count should be set
      * @param count the new value for that {@link Source}
+     * @deprecated use {@link #set(Source, int)} instead
      */
+    @Deprecated
     void setSourceCount(Source source, int count) {
         sourcesCount.put(source, count);
     }
@@ -180,7 +210,9 @@ public class GeneDiseaseCombination extends BiologicalEntityCombination<Gene, Di
      * {@link #add(Source, PubmedEvidence)} is suggested instead.
      * @param source the {@link Source} for which the {@link PubmedEvidence} should be set
      * @param evidence a {@link Set} containing all {@link PubmedEvidence} for that {@link Source}
+     * @deprecated use {@link #set(Source, int, Set)} instead
      */
+    @Deprecated
     void setPubmedEvidenceForSource(Source source, Set<PubmedEvidence> evidence) {
         pubmedEvidence.put(source, evidence);
     }

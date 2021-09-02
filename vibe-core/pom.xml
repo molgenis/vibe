@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.molgenis</groupId>
         <artifactId>vibe</artifactId>
-        <version>5.1.5-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>vibe-core</artifactId>
     <packaging>jar</packaging>
@@ -146,7 +146,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.6</version>
         </dependency>
     </dependencies>
 </project>

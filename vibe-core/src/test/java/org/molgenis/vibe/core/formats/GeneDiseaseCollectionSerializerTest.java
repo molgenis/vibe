@@ -1,15 +1,19 @@
-package org.molgenis.vibe.core.formats.serialization;
+package org.molgenis.vibe.core.formats;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.molgenis.vibe.core.formats.*;
 
 import java.net.URI;
 import java.util.Arrays;
 
+/**
+ * Replaced by {@link org.molgenis.vibe.core.formats.serialization.json.gene_disease_collection.GeneDiseaseCollectionJsonSerializationTest}
+ * and subclasses.
+ */
+@Deprecated
 class GeneDiseaseCollectionSerializerTest {
     private static GeneDiseaseCollection geneDiseaseCollection;
     private static Gson gson;
@@ -78,6 +82,37 @@ class GeneDiseaseCollectionSerializerTest {
 
         // ncbigene, umls & sources JsonObjects were not ordered to reduce required processing power (Set -> List -> sort() ).
         String expectedOutput = "{\n" +
+                "  \"ncbigene\": {\n" +
+                "    \"1111111\": {\n" +
+                "      \"hgnc\": \"AAA\"\n" +
+                "    },\n" +
+                "    \"2222222\": {\n" +
+                "      \"hgnc\": \"BBB\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"umls\": {\n" +
+                "    \"C2222222\": {\n" +
+                "      \"name\": \"another disease name\"\n" +
+                "    },\n" +
+                "    \"C3333333\": {\n" +
+                "      \"name\": \"yet another disease\"\n" +
+                "    },\n" +
+                "    \"C1111111\": {\n" +
+                "      \"name\": \"a disease name\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"sources\": {\n" +
+                "    \"Orphanet\": {\n" +
+                "      \"fullName\": \"Orphanet dataset\",\n" +
+                "      \"uri\": \"http://rdf.disgenet.org/v6.0.0/void/ORPHANET\",\n" +
+                "      \"level\": \"curated\"\n" +
+                "    },\n" +
+                "    \"BeFree\": {\n" +
+                "      \"fullName\": \"BeFree dataset\",\n" +
+                "      \"uri\": \"http://rdf.disgenet.org/v6.0.0/void/BEFREE\",\n" +
+                "      \"level\": \"literature\"\n" +
+                "    }\n" +
+                "  },\n" +
                 "  \"combinations\": [\n" +
                 "    {\n" +
                 "      \"ncbigene\": \"1111111\",\n" +
@@ -145,38 +180,7 @@ class GeneDiseaseCollectionSerializerTest {
                 "        }\n" +
                 "      ]\n" +
                 "    }\n" +
-                "  ],\n" +
-                "  \"ncbigene\": {\n" +
-                "    \"1111111\": {\n" +
-                "      \"hgnc\": \"AAA\"\n" +
-                "    },\n" +
-                "    \"2222222\": {\n" +
-                "      \"hgnc\": \"BBB\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"umls\": {\n" +
-                "    \"C2222222\": {\n" +
-                "      \"name\": \"another disease name\"\n" +
-                "    },\n" +
-                "    \"C3333333\": {\n" +
-                "      \"name\": \"yet another disease\"\n" +
-                "    },\n" +
-                "    \"C1111111\": {\n" +
-                "      \"name\": \"a disease name\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"sources\": {\n" +
-                "    \"Orphanet\": {\n" +
-                "      \"fullName\": \"Orphanet dataset\",\n" +
-                "      \"uri\": \"http://rdf.disgenet.org/v6.0.0/void/ORPHANET\",\n" +
-                "      \"level\": \"curated\"\n" +
-                "    },\n" +
-                "    \"BeFree\": {\n" +
-                "      \"fullName\": \"BeFree dataset\",\n" +
-                "      \"uri\": \"http://rdf.disgenet.org/v6.0.0/void/BEFREE\",\n" +
-                "      \"level\": \"literature\"\n" +
-                "    }\n" +
-                "  }\n" +
+                "  ]\n" +
                 "}";
 
         Assertions.assertEquals(expectedOutput, actualOutput);
