@@ -8,6 +8,9 @@ import org.molgenis.vibe.core.formats.GeneSymbol;
  * Contains all constants to be used in child classes for (de)serialization.
  */
 abstract class GeneDiseaseCollectionJsonSerialization {
+    GeneDiseaseCollectionJsonSerialization() {
+    }
+
     // Primary key for all combinations.
     protected static final String COMBINATIONS_KEY = "combinations";
     protected static final String COMBINATION_GENE_KEY = Gene.ID_PREFIX;

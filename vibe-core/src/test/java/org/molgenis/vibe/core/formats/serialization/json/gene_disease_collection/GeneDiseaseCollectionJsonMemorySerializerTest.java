@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vibe.core.formats.GeneDiseaseCollection;
 
-public class GeneDiseaseCollectionJsonMemorySerializerTest extends GeneDiseaseCollectionJsonSerializationTest {
+class GeneDiseaseCollectionJsonMemorySerializerTest extends GeneDiseaseCollectionJsonSerializationTest {
     Gson gson = generateGsonBuilder().registerTypeAdapter(
             GeneDiseaseCollection.class, new GeneDiseaseCollectionJsonMemorySerializer()).create();
 

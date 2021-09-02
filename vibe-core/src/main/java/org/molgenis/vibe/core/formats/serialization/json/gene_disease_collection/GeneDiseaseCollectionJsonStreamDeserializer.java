@@ -25,6 +25,24 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
         implements Closeable {
     private JsonReader reader;
 
+    /**
+     * Retrieve next name and validates if it equal to the expected next name. If the next name does not adhere to the
+     * {@code expectedName}, throws an {@link JsonParseException} instead.
+     * @param reader the reader from which to retrieve the next name
+     * @param expectedName the expected next name
+     * @return the next name
+     * @throws IOException
+     * @throws JsonParseException if {@code !reader.nextName().equals(expectedName)}
+     */
+    private static String retrieveValidatedNextName(JsonReader reader, String expectedName) throws IOException {
+        // .nextName() throws IllegalStateException if next JsonElement is not a name.
+        String actualName = reader.nextName();
+        if(!actualName.equals(expectedName)) {
+            throw new JsonParseException("JsonToken does not match the expected name. Expected \"" + expectedName + "\" but was \"" + actualName + "\"");
+        }
+        return actualName;
+    }
+
     public GeneDiseaseCollectionJsonStreamDeserializer(InputStream inputStream) {
         this.reader = new JsonReader(new InputStreamReader(requireNonNull(inputStream), StandardCharsets.UTF_8));
     }
@@ -32,51 +50,26 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
     public GeneDiseaseCollection readJsonStream() throws IOException {
         try {
             return readCollectionStream();
-        } catch (JsonParseException e) {
+        } catch (JsonParseException | IllegalStateException e) {
             throw new JsonIOParseException(e);
         }
     }
 
     private GeneDiseaseCollection readCollectionStream() throws IOException {
         GeneDiseaseCollection gdc = new GeneDiseaseCollection();
-        boolean combinationDigested = false;
-
-        // Stores maps with all genes/diseases/sources.
-        Map<String,Gene> genesMap = null;
-        Map<String,Disease> diseasesMap = null;
-        Map<String,Source> sourcesMap = null;
 
         // Digests JSON.
         reader.beginObject();
-        while (reader.hasNext()) {
-            switch(reader.peek()) {
-                case NAME:
-                    String name = reader.nextName();
-                    if(name.equals(GENES_KEY)) {
-                        genesMap = readGenesStream();
-                    } else if(name.equals(DISEASES_KEY)) {
-                        diseasesMap = readDiseasesStream();
-                    } else if(name.equals(SOURCES_KEY)) {
-                        sourcesMap = readSourcesStream();
-                    } else if(name.equals(COMBINATIONS_KEY)) {
-                        if(genesMap == null || diseasesMap == null || sourcesMap == null) {
-                            throw new JsonParseException("Invalid inputStream: combinations were found before all genes/diseases/sources could be collected.");
-                        } else {
-                            readCombinationsStream(gdc, genesMap, diseasesMap, sourcesMap);
-                            combinationDigested = true;
-                        }
-                    }
-                    break;
-                default:
-                    throw new JsonParseException("an unexpected JsonToken was found:" + reader.peek().toString());
-            }
-        }
+        retrieveValidatedNextName(reader, GENES_KEY);
+        Map<String,Gene> genesMap = readGenesStream();
+        retrieveValidatedNextName(reader, DISEASES_KEY);
+        Map<String,Disease> diseasesMap = readDiseasesStream();
+        retrieveValidatedNextName(reader, SOURCES_KEY);
+        Map<String,Source> sourcesMap = readSourcesStream();
+        retrieveValidatedNextName(reader, COMBINATIONS_KEY);
+        readCombinationsStream(gdc, genesMap, diseasesMap, sourcesMap);
         reader.endObject();
 
-        // Checks whether readCombinationsStream() was triggered.
-        if(!combinationDigested) {
-            throw new JsonParseException("No combinations were digested.");
-        }
         return gdc;
     }
 
@@ -116,14 +109,12 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
 
             reader.beginObject();
             while(reader.hasNext()) {
-                switch(reader.peek()) {
-                    case NAME:
-                        String objectId = reader.nextName();
-                        digestObject(entityMap, JsonParser.parseReader(reader).getAsJsonObject(), objectId);
-                        break;
-                    default:
-                        throw new JsonParseException("an unexpected JsonToken was found:" + reader.peek().toString());
-                }
+                // .nextName() throws IllegalStateException if next JsonElement is not a name.
+                String name = reader.nextName();
+                // .getAsJsonObject() throws IllegalStateException if next JsonElement is not a JsonObject.
+                JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
+                // Digests object.
+                digestObject(entityMap, jsonObject, name);
             }
             reader.endObject();
 
@@ -141,7 +132,7 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
     }
 
     private Map<String,Gene> readGenesStream() throws IOException {
-        JsonMapCollector digester = new JsonMapCollector<Gene>(reader) {
+        JsonMapCollector<Gene> digester = new JsonMapCollector<Gene>(reader) {
             @Override
             protected void digestObject(Map entityMap, JsonObject jsonObject, String objectId) {
                 entityMap.put(objectId, deserializeGene(jsonObject, objectId));
@@ -152,7 +143,7 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
     }
 
     private Map<String,Disease> readDiseasesStream() throws IOException {
-        JsonMapCollector digester = new JsonMapCollector<Disease>(reader) {
+        JsonMapCollector<Disease> digester = new JsonMapCollector<Disease>(reader) {
             @Override
             protected void digestObject(Map<String, Disease> entityMap, JsonObject jsonObject, String objectId) {
                 entityMap.put(objectId, deserializeDisease(jsonObject, objectId));
@@ -163,7 +154,7 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
     }
 
     private Map<String,Source> readSourcesStream() throws IOException {
-        JsonMapCollector digester = new JsonMapCollector<Source>(reader) {
+        JsonMapCollector<Source> digester = new JsonMapCollector<Source>(reader) {
             @Override
             protected void digestObject(Map<String, Source> entityMap, JsonObject jsonObject, String objectId) {
                 entityMap.put(objectId, deserializeSource(jsonObject, objectId));
@@ -178,15 +169,10 @@ public class GeneDiseaseCollectionJsonStreamDeserializer extends GeneDiseaseColl
             throws IOException {
         reader.beginArray();
         while(reader.hasNext()) {
-            switch(reader.peek()) {
-                case BEGIN_OBJECT:
-                    gdc.add(deserializeGeneDiseaseCombination(
-                            JsonParser.parseReader(reader).getAsJsonObject(), genesMap, diseasesMap, sourcesMap)
-                    );
-                    break;
-                default:
-                    throw new JsonParseException("an unexpected JsonToken was found:" + reader.peek().toString());
-            }
+            // .getAsJsonObject() throws IllegalStateException if next JsonElement is not a JsonObject.
+            gdc.add(deserializeGeneDiseaseCombination(
+                    JsonParser.parseReader(reader).getAsJsonObject(), genesMap, diseasesMap, sourcesMap)
+            );
         }
         reader.endArray();
     }

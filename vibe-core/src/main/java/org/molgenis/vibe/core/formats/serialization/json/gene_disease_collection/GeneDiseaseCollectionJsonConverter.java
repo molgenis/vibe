@@ -23,6 +23,9 @@ public final class GeneDiseaseCollectionJsonConverter {
         gson = gsonBuilder.create();
     }
 
+    private GeneDiseaseCollectionJsonConverter() {
+    }
+
     public static String serialize(GeneDiseaseCollection geneDiseaseCollection) {
         return gson.toJson(geneDiseaseCollection);
     }

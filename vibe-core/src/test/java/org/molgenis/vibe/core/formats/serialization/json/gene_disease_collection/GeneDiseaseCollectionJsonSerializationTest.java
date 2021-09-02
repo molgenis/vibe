@@ -13,7 +13,7 @@ import org.molgenis.vibe.core.formats.Source;
 import java.net.URI;
 import java.util.Arrays;
 
-public class GeneDiseaseCollectionJsonSerializationTest {
+class GeneDiseaseCollectionJsonSerializationTest {
     static GeneDiseaseCollection expectedGeneDiseaseCollection;
     static GeneDiseaseCollection gdcWithoutCombinationEvidence;
     static GeneDiseaseCollection gdcWithoutScore;

@@ -9,7 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class GeneDiseaseCollectionJsonStreamDeserializerTest extends GeneDiseaseCollectionJsonSerializationTest {
+class GeneDiseaseCollectionJsonStreamDeserializerTest extends GeneDiseaseCollectionJsonSerializationTest {
     @Test
     void testReadJsonStream() throws IOException {
         try(InputStream inputStream = new ByteArrayInputStream(expectedJson.getBytes())) {
