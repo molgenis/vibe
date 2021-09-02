@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-class GeneDiseaseCollectionJsonStreamSerializerTest extends GeneDiseaseCollectionJsonSerializationTest {
+class GeneDiseaseCollectionJsonStreamSerializerTest extends GeneDiseaseCollectionJsonSerializationTestsParent {
     Gson gson = generateGsonBuilder().create();
 
     @Test

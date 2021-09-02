@@ -14,7 +14,7 @@ import java.io.PipedOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-class GeneDiseaseCollectionJsonConverterIT extends GeneDiseaseCollectionJsonSerializationTest {
+class GeneDiseaseCollectionJsonConverterIT extends GeneDiseaseCollectionJsonSerializationTestsParent {
     @Test
     void testMemorySerializationWithMemoryDeserialization() {
         GeneDiseaseCollection returnedCollection = GeneDiseaseCollectionJsonConverter.deserialize(
