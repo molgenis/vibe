@@ -89,8 +89,17 @@ Before building/testing, be sure the needed test resources are downloaded. This 
    - An überjar for the command-line tool can be found at `vibe-cli/target/vibe-with-dependencies-<version>.jar` .
    - Checksums are available in the `<sub-module>/target/checksums/` folders for the following formats:
      - MD5
+     - SHA-256
      - SHA-512
-     - SHA3-512
+     - SHA3-512 
+
+### Branches
+
+- release -> release branches (f.e. `release/5.0`)
+- feature -> a branch for a new feature (f.e. `feature/hdt`)
+- fix -> implementing a fix (f.e. `fix/invalid_hgnc`)
+- chore -> simple maintenance tasks (f.e. `chore/readme_update`)
+- backmerge -> merging back fixes on release branches back to master (f.e. `backmerge/5.0`)
 
 ### Notes
 

@@ -33,3 +33,6 @@ hs_err_pid*
 
 # Files generated for database tests.
 database/test/*.tsv
+
+# A file containing the release notes of a specific version (generated through).
+release_notes.md
