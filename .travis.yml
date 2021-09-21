@@ -16,8 +16,7 @@ before_install:
 script:
   - mvn clean install sonar:sonar -Pcoverage -Dsonar.projectKey=org.molgenis:vibe
 before_deploy: # Runs per provider: https://docs.travis-ci.com/user/job-lifecycle#deploying-your-code. Workaround attempt below.
-  - |
-    if [[ ! ${RAN_BEFORE_DEPLOY+isset} == isset ]]; then
+  - if [[ ! ${RAN_BEFORE_DEPLOY+isset} == isset ]]; then
       export RAN_BEFORE_DEPLOY=1
       # Check if travis tag is equal to version defined in pom.xml file, non-zero exit if not.
       if [[ $TRAVIS_TAG != $(mvn -q help:evaluate -Dexpression=project.version -DforceStdout) ]]; then
