@@ -23,4 +23,5 @@ deploy:
     prerelease: true
     on:
       tags: true
+      condition: ${TRAVIS_TAG} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$
     edge: true # opt in to dpl v2
