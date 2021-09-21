@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <build>
-        <finalName>vibe-with-dependencies-${project.version}</finalName>
+        <finalName>vibe</finalName>
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
