@@ -15,22 +15,11 @@ before_install:
   - bash TestsPreprocessor.sh
 script:
   - mvn clean install sonar:sonar -Pcoverage -Dsonar.projectKey=org.molgenis:vibe
-before_deploy: # Runs per provider: https://docs.travis-ci.com/user/job-lifecycle#deploying-your-code. Workaround attempt below.
-  - if [[ ! ${RAN_BEFORE_DEPLOY+isset} == isset ]]; then
-      export RAN_BEFORE_DEPLOY=1
-      # Check if travis tag is equal to version defined in pom.xml file, non-zero exit if not.
-      if [[ $TRAVIS_TAG != $(mvn -q help:evaluate -Dexpression=project.version -DforceStdout) ]]; then
-        exit 1
-      fi
-      # Generate release file.
-      sh .ci/GenerateReleaseNotes.sh
-    fi
 deploy:
   - provider: releases
     token:
       secure: "Sv/CNT+l08k41ny8hcVOR2lXMF+2IhslZGcY2xndFWPugkHbzXiuF6RtZc0Q1f53GzV2lUJBmnxzmKZMudjFOhypEaJADRQJxC8k3GKNpLIDbSDSRjZ0OJqCz3a4O/Q5rQNDwHfkK27HsQUwvp0XC62MG+wUMl5L5i65ptVjNtXH6v2cRzIbPRIZoIviujOiig7CZq4AGmUT+S7u4W5Ush4Quinu0jUAlltvVDf4+4A/CDO1OjuPuvfgiFcxWoxh0t9+MzpeXxn22gTSF628z4MxZT/OL82XE49KdsOuCF8ttWUj0Ettt8SdWk+ZXqNBKYQ7Zq0mrJQoHDRJ+D0TIpY1rcRFUfcTr655VRDGMgQQuA65GcYzlWwRnu3lKT3Yrk7frkQzJcg1NqXk9pNYsU8kijbun3Lt+099oA4KGvGKOiQPI5rdvRYh42rmUgG3ph/jgmN6kXNrT8NDbDUThWMwA/ZsJzTkVn6co0Fwx+cNSFonqs5/vycv8lfM4Q4eqfi0MKVWorjpWVByftVrg4dmytjepcW20un+gCh5Zu8EkoQrF/YhGx2JAcGm76zvRCL1zdABdRK9BXrbXevGoUpKGWWoNU66uA2RDArwCTYv9HzkANy1lyb/SaiT43W+42vQVsTQLDWCvi/vSJIzOsjmrPGEFQiAh5h91PlnqAw="
     file: "vibe-cli/target/vibe.jar"
-    release_notes_file: "release_notes.md"
     prerelease: true
     on:
       tags: true
