@@ -5,7 +5,7 @@ jdk: openjdk11
 cache:
   directories:
     - "$HOME/.m2"
-    - "/shared_testdata/shared"
+    - "$HOME/build/molgenis/vibe/shared_testdata/shared"
 addons:
   sonarcloud:
     organization: molgenis
