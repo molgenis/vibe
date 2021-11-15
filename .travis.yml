@@ -6,6 +6,10 @@ cache:
   directories:
     - "$HOME/.m2"
     - "$HOME/build/molgenis/vibe/shared_testdata/shared"
+branches:
+  only:
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 addons:
   sonarcloud:
     organization: molgenis
