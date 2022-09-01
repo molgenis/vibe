@@ -3,7 +3,7 @@
 
 # VIBE
 
-A tool to generate prioritized genes using phenotype information. See publication [K. Joeri van der Velde, Sander van den Hoek et al (2020), Advanced Genetics 1(1)](https://doi.org/10.1002/ggn2.10023)
+A tool to generate prioritized genes using phenotype information. See publication [K. Joeri van der Velde, Sander van den Hoek et al (2020), Advanced Genetics 1(1)](https://doi.org/10.1002/ggn2.10023).
 
 ## Web app
 
